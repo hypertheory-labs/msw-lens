@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800&display=swap');
+
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Atkinson Hyperlegible Next', sans-serif;
+  --font-weight-light: 200;
+  --font-weight-normal: 400;
+  --font-weight-bold: 500;
+  --font-weight-bolder: 700;
+  --font-weight-boldest: 800;
+  --font-optical-sizing: auto;
+}
+
+@layer components {
+  .prose img {
+    @apply max-w-[90%] mx-auto rounded-sm border-4 border-accent/80 dark:bg-black bg-white;
+  }
+  .prose img[src$='.svg'] {
+    @apply dark:hue-rotate-180 dark:invert-180 p-8 dark:bg-white; /* SVGs in dark mode get inverted for better visibility because it is inverted, I set the background to white to get black. Duh. */
+  }
+
+  /* Add red asterisk after labels for required inputs */
+  label:has(+ input[required]) .label-text::after,
+  label:has(+ select[required]) .label-text::after,
+  label:has(+ textarea[required]) .label-text::after {
+    content: ' *';
+    @apply text-error;
+  }
+}
+
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
+@config "./tailwind-prose.config.js";
+
+@plugin "daisyui" {
+  themes: dark --default --prefersdark, nord;
+}
+
+@plugin "daisyui/theme" {
+  name: 'dark';
+  default: true;
+  prefersdark: true;
+  color-scheme: 'dark';
+  --color-base-100: oklch(36.7% 0.016 252.42);
+  --color-base-200: oklch(29.5% 0.014 253.1);
+  --color-base-300: oklch(24.5% 0.012 254.09);
+  --color-base-content: oklch(84% 0.029 256.847);
+  --color-primary: oklch(64.4% 0.233 277.117);
+  --color-primary-content: oklch(96% 0.018 272.314);
+  --color-secondary: oklch(75.2% 0.21 96.7);
+  --color-secondary-content: oklch(94% 0.028 342.258);
+  --color-accent: oklch(81.4% 0.072 98.5);
+  --color-accent-content: oklch(38% 0.063 188.416);
+  --color-neutral: oklch(14% 0.005 285.823);
+  --color-neutral-content: oklch(92% 0.004 286.32);
+  --color-info: oklch(74% 0.16 232.661);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-success: oklch(76% 0.177 163.223);
+  --color-success-content: oklch(37% 0.077 168.94);
+  --color-warning: oklch(82% 0.189 84.429);
+  --color-warning-content: oklch(41% 0.112 45.904);
+  --color-error: oklch(71% 0.244 13.428);
+  --color-error-content: oklch(27% 0.105 12.094);
+  --radius-selector: 0rem;
+  --radius-field: 0rem;
+  --radius-box: 0rem;
+  --size-selector: 0.3125rem;
+  --size-field: 0.3125rem;
+  --border: 1.5px;
+  --depth: 1;
+  --noise: 1;
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "FeatureLandingSchematic",
+  "title": "Feature Landing Schematic",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The kebab-case name of the feature (e.g. 'catalog', 'orders')",
+      "$default": { "$source": "argv", "index": 0 }
+    },
+    "title": {
+      "type": "string",
+      "description": "Display title for the nav link (defaults to title-case of name)"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Lucide icon name for the nav link",
+      "default": "lucideCircle"
+    },
+    "path": {
+      "type": "string",
+      "description": "URL path segment (defaults to name)"
+    }
+  },
+  "required": ["name"]
+}

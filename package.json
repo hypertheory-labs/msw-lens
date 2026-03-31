@@ -1,0 +1,91 @@
+{
+  "name": "angular-starter",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "start:prod": "ng serve --configuration production",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "lint": "ng lint",
+    "format": "npx prettier --write .",
+    "sheriff:check": "sheriff verify",
+    "sheriff:list": "sheriff list",
+    "sheriff:detective": "detective",
+    "generate-types": "openapi-ts",
+    "e2e": "npx playwright test",
+    "e2e:ui": "npx playwright test --ui",
+    "build:schematics": "tsc -p schematics/tsconfig.json && cp schematics/collection.json dist/schematics/ && cp schematics/src/feature-landing/schema.json dist/schematics/src/feature-landing/ && cp -r schematics/src/feature-landing/files dist/schematics/src/feature-landing/ && cp schematics/package.json dist/schematics/"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "packageManager": "npm@11.6.4",
+  "dependencies": {
+    "@angular/common": "^21.2.4",
+    "@angular/compiler": "^21.2.4",
+    "@angular/core": "^21.2.4",
+    "@angular/forms": "^21.2.4",
+    "@angular/platform-browser": "^21.2.4",
+    "@angular/router": "^21.2.4",
+    "@msw/playwright": "^0.4.5",
+    "@ng-icons/core": "^33.1.0",
+    "@ng-icons/lucide": "^33.1.0",
+    "@ngrx/operators": "^21.0.1",
+    "@ngrx/signals": "^21.0.1",
+    "rxjs": "~7.8.2",
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@angular-devkit/architect": "^0.2102.2",
+    "@angular-devkit/build-angular": "^21.2.2",
+    "@angular-devkit/core": "^21.2.2",
+    "@angular/build": "^21.2.2",
+    "@angular/cli": "^21.2.2",
+    "@angular/compiler-cli": "^21.2.4",
+    "@angular/platform-browser-dynamic": "^21.2.4",
+    "@hey-api/openapi-ts": "^0.92.4",
+    "@playwright/test": "1.58.2",
+    "@softarc/detective": "^2.0.2",
+    "@softarc/eslint-plugin-sheriff": "^0.19.6",
+    "@softarc/sheriff-core": "^0.19.6",
+    "@tailwindcss/forms": "^0.5.11",
+    "@tailwindcss/postcss": "^4.2.1",
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/node": "^25.5.0",
+    "@vitest/coverage-v8": "^4.1.0",
+    "@vitest/ui": "^4.1.0",
+    "angular-eslint": "21.2.0",
+    "daisyui": "^5.5.19",
+    "eslint": "^9.39.4",
+    "jsdom": "^28.1.0",
+    "msw": "^2.12.10",
+    "playwright-ng-schematics": "^21.0.5",
+    "postcss": "^8.5.8",
+    "prettier": "^3.8.1",
+    "prismjs": "^1.30.0",
+    "simple-scaffold": "^2.3.3",
+    "tailwindcss": "^4.2.1",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "8.54.0",
+    "vitest": "^4.1.0"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
+}

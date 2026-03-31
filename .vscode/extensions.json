@@ -1,0 +1,19 @@
+{
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=827846
+  "recommendations": [
+    "angular.ng-template",
+    "l13rary.l13-diff",
+    "formulahendry.auto-rename-tag",
+    "dbaeumer.vscode-eslint",
+    "pomdtr.excalidraw-editor",
+    "afzalsayed96.icones",
+    "mskelton.npm-outdated",
+    "chrisdias.vscode-opennewinstance",
+    "esbenp.prettier-vscode",
+    "humao.rest-client",
+    "wenfangdu.snippet-generator",
+    "bradlc.vscode-tailwindcss",
+    "orta.vscode-twoslash-queries",
+    "vitest.explorer"
+  ]
+}

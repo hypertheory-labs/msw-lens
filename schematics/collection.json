@@ -1,0 +1,10 @@
+{
+  "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "feature-landing": {
+      "description": "Generate a new feature landing area with routes and nav link",
+      "factory": "./src/feature-landing/index#featureLanding",
+      "schema": "./src/feature-landing/schema.json"
+    }
+  }
+}
