@@ -104,7 +104,7 @@ Scenario archetypes to consider:
 - `not-found` — 404, resource doesn't exist
 - `unauthorized` — 401, tests auth guards and login redirect
 - `server-error` — 500, tests error boundary / fallback UI
-- `slow` — MSW delay:realistic, tests loading states
+- `slow` — MSW delay('real'), tests loading states
 - `malformed-data` — response missing optional fields or with nulls where not anticipated
 
 **Collection endpoints** (array/list responses):
@@ -132,6 +132,34 @@ A LLM with full component + template + types can catch:
 
 These are the findings the developer didn't ask for. They happen because the format is rich
 enough to reason beyond the explicit question.
+
+## The Legibility Guarantee — and Its Edges
+
+*From cold-instance peer review of the cart experiment:*
+
+The context generation works well when endpoints are visible as literal strings in the
+crawled source files. The absolute URL (`https://store.company.com/user/cart`) was readable
+because it was hardcoded in the store's fetch call — follow-imports found it directly.
+
+But there is a class of Angular patterns where the endpoint URL won't appear in the crawled
+files:
+- `HttpClient` with a base URL injected from an environment token
+- Interceptors that rewrite paths at runtime
+- Service abstractions where the URL is assembled from parts
+
+In these cases, the tool hands the LLM everything it can find, and the URL is still opaque.
+The LLM will see the service call but not the resolved endpoint.
+
+**This is not a bug in the tool — it's a map of its territory.**
+
+The legibility guarantee is: *if the endpoint URL is visible as a literal in the crawled
+files, the tool provides sufficient context.* When it isn't, the developer needs to provide
+the URL manually — either in the prompt or by designing their stores to make endpoints
+discoverable (a good practice regardless).
+
+The absolute URL also surfaced a secondary note: the endpoint key in `active-scenarios.ts`
+must match exactly what MSW intercepts. Absolute URLs work fine in MSW, but the key must be
+the full URL, and a base URL change requires updating both the store and the handler.
 
 ## Open Questions
 - Should the prompt explicitly request Playwright test suggestions? (Stellar's cold instance
