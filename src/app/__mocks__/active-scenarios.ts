@@ -5,6 +5,7 @@
  */
 const activeScenarios: Record<string, string> = {
   '/api/user/': 'logged-in',
+  'https://store.company.com/user/cart': 'large-cart',
 };
 
 export default activeScenarios;

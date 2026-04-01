@@ -1,5 +1,5 @@
 # msw-lens — project context
-generated: 2026-04-01T15:32:44.969Z
+generated: 2026-04-01T16:57:14.394Z
 
 > Drop this file into any LLM conversation for instant context about what
 > is mocked in this project, what scenarios exist, and what is currently active.
@@ -8,9 +8,28 @@ generated: 2026-04-01T15:32:44.969Z
 
 | endpoint | method | active scenario |
 |----------|--------|-----------------|
+| `https://store.company.com/user/cart` | GET | `large-cart` |
 | `/api/user/` | GET | `logged-in` |
 
 ## Scenario details
+
+### GET `https://store.company.com/user/cart`
+manifest: `src/app/__mocks__/cart/cart.yaml`
+> Current user's shopping cart items
+
+- **typical** — Cart with several items — the happy path; verifies each item renders with name, unit price, quantity, and computed total
+- **empty** — Cart contains no items — tests whether an empty-state message and call-to-action appear (currently the template has no @empty block; this will render as a blank page body)
+- **single-item** — Exactly one item in the cart — edge of the list; tests singular layout and verifies @for renders without a minimum-item assumption
+- **large-cart** ✓ **(active)** — Twelve or more items — tests whether the list overflows its container or requires pagination that doesn't exist yet
+- **slow** *(delay: real)* — Simulates a sluggish cart service — tests whether a loading skeleton or spinner appears during fetch (currently no loading state in the template)
+- **unauthorized** *(401)* — User session has expired — tests whether an auth guard intercepts and redirects to login, or whether the component silently shows an empty cart
+- **server-error** *(500)* — Cart service is unavailable — tests whether an error message or fallback UI appears (currently _load() swallows fetch errors silently)
+- **zero-price-item** — Cart includes a fully discounted item at $0.00 — tests that the currency pipe renders zero gracefully and the line total shows $0.00 rather than blank or NaN
+- **high-value** — Items with high unit prices and large quantities — tests that four-to-five digit currency totals don't truncate or overflow the flex layout
+
+sourceHints:
+- `src/app/areas/shopping-card/shopping-card-landing/data/cart-store.ts`
+- `src/app/areas/shopping-card/shopping-card-landing/internal/pages/cart.ts`
 
 ### GET `/api/user/`
 manifest: `src/app/__mocks__/auth/user.yaml`
@@ -18,7 +37,7 @@ manifest: `src/app/__mocks__/auth/user.yaml`
 
 - **logged-in** ✓ **(active)** — Authenticated user with Student and Employee roles — the happy path
 - **logged-out** *(401)* — No active session — tests that auth guards redirect correctly and login UI appears
-- **slow** *(delay: realistic)* — Simulates a sluggish auth service — tests loading skeleton states in consuming components
+- **slow** *(delay: real)* — Simulates a sluggish auth service — tests loading skeleton states in consuming components
 - **server-error** *(500)* — Auth service is unavailable — tests error boundary or fallback UI behavior
 - **admin** — User with an elevated Admin role — tests role-based UI variations (nav items, gated features)
 
@@ -68,5 +87,5 @@ scenarios:
     description: What UI behavior this tests (not just what the data looks like)
     active: true        # marks the default scenario
     httpStatus: 401     # optional — omit for 200
-    delay: realistic    # optional — MSW delay mode
+    delay: real    # optional — MSW delay mode
 ```
