@@ -4,7 +4,7 @@
  * Keys are endpoint paths, values are scenario names defined in the handler.
  */
 const activeScenarios: Record<string, string> = {
-  '/api/user/': 'server-error',
+  '/api/user/': 'logged-in',
 };
 
 export default activeScenarios;

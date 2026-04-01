@@ -15,6 +15,13 @@ const realRoutes: Routes = [
         (r) => r.profileLandingFeatureRoutes,
       ),
   },
+  {
+    path: 'shopping-card',
+    loadChildren: () =>
+      import('./areas/shopping-card/shopping-card-landing/shopping-card.routes').then(
+        (r) => r.shoppingCardFeatureRoutes,
+      ),
+  },
 ];
 
 const devRoutes: Routes = [

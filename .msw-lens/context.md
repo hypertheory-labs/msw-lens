@@ -1,5 +1,5 @@
 # msw-lens — project context
-generated: 2026-04-01T14:45:14.982Z
+generated: 2026-04-01T15:32:44.969Z
 
 > Drop this file into any LLM conversation for instant context about what
 > is mocked in this project, what scenarios exist, and what is currently active.
@@ -8,7 +8,7 @@ generated: 2026-04-01T14:45:14.982Z
 
 | endpoint | method | active scenario |
 |----------|--------|-----------------|
-| `/api/user/` | GET | `server-error` |
+| `/api/user/` | GET | `logged-in` |
 
 ## Scenario details
 
@@ -16,10 +16,10 @@ generated: 2026-04-01T14:45:14.982Z
 manifest: `src/app/__mocks__/auth/user.yaml`
 > Currently authenticated user profile
 
-- **logged-in** — Authenticated user with Student and Employee roles — the happy path
+- **logged-in** ✓ **(active)** — Authenticated user with Student and Employee roles — the happy path
 - **logged-out** *(401)* — No active session — tests that auth guards redirect correctly and login UI appears
 - **slow** *(delay: realistic)* — Simulates a sluggish auth service — tests loading skeleton states in consuming components
-- **server-error** ✓ **(active)** *(500)* — Auth service is unavailable — tests error boundary or fallback UI behavior
+- **server-error** *(500)* — Auth service is unavailable — tests error boundary or fallback UI behavior
 - **admin** — User with an elevated Admin role — tests role-based UI variations (nav items, gated features)
 
 sourceHints:
@@ -40,7 +40,7 @@ on every run.
 **Commands:**
 - `npm run lens` — interactive scenario switcher (single run)
 - `npm run lens:watch` — stay in the switcher, Ctrl+C to exit
-- `npm run lens:context <component.ts>` — generate a prompt for an LLM
+- `npm run lens:context -- <component.ts>` — generate a prompt for an LLM
 
 Manifests live alongside handlers: `auth/user.yaml` next to `auth/user.ts`.
 

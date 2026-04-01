@@ -115,5 +115,7 @@ export class App {
   }
   store = inject(authStore);
   uiStore = inject(appUiStore);
-  links = signal<(SectionLink & { icon: IconName })[]>([]);
+  links = signal<(SectionLink & { icon: IconName })[]>([
+    { path: '/shopping-card', title: 'Shopping Card', icon: 'lucideWrench' },
+  ]);
 }
