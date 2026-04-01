@@ -5,7 +5,7 @@ Tested in the wild: a completely cold LLM instance — no CLAUDE.md, no memories
 
 This validates the core thesis: **structured, self-describing output is sufficient context for an LLM to reason meaningfully about a running application.** No scaffolding required. No lengthy explanation. The data speaks.
 
-This is the confidence baseline for msw-tui's self-description approach. If we design the manifest and self-description output with the same care Stellar brought to its recordings format, it will work.
+This is the confidence baseline for msw-lens's self-description approach. If we design the manifest and self-description output with the same care Stellar brought to its recordings format, it will work.
 
 ## The Pre-Built Prompt Idea
 "The developer drops this file into a conversation" is passive and loses context. A better first-class workflow:
@@ -21,7 +21,7 @@ The design goal is not "AI does the work." It is "AI makes the developer more ca
 
 Tools that outsource thinking make developers dumber over time. Tools that surface what developers missed, reveal race conditions, suggest unconsidered edge cases — those make developers smarter. The self-describing manifest approach lands on the right side of this line: the developer still owns the design, the LLM finds the gaps.
 
-This should be a stated principle of the project: **msw-tui is designed to augment developer thinking, not replace it.**
+This should be a stated principle of the project: **msw-lens is designed to augment developer thinking, not replace it.**
 
 ## TUI Output: "Explain This" Mode
 Beyond the operational switcher and the creation interview, a third output:

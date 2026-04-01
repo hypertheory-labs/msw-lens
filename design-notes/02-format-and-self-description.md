@@ -10,8 +10,8 @@ Use YAML for the scenario manifests. Reasons:
 Caveat resolved: Teams chat destroys YAML formatting, which matters in a course context. Already solved — a VS Code extension (built separately) handles pulling files over for students without copy-paste.
 
 ## Self-Description on First Run (Jeff's idea)
-On first run, the TUI generates a self-description file — something like `msw-tui-context.md` or `msw-tui.llms.txt` — that explains:
-- What msw-tui is and how it works
+On first run, msw-lens generates a self-description file — something like `msw-lens-context.md` or `msw-lens.llms.txt` — that explains:
+- What msw-lens is and how it works
 - The manifest format and what each field means
 - The scenario archetype vocabulary (what "empty", "slow", "overloaded" etc. mean semantically)
 - The HMR mechanism

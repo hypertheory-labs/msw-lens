@@ -1,6 +1,6 @@
 # MSW Scenario Manifest
 # This file is the source of truth for what scenarios exist for this endpoint.
-# It is read by msw-tui to populate the scenario switcher.
+# It is read by msw-lens to populate the scenario switcher.
 # It can also be dropped into an LLM conversation as context.
 
 endpoint: /api/user/

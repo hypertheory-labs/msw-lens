@@ -1,4 +1,4 @@
-# msw-tui — Project Context for Claude
+# msw-lens — Project Context for Claude
 
 This file is owned and maintained by Claude. Jeff will not edit it.
 
