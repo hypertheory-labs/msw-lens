@@ -70,7 +70,8 @@ export function discoverRelatedFiles(entryTs: string): string[] {
     }
   }
 
-  // Level 2: imports from level-1 files (type files, etc.)
+  // Level 2: imports from level-1 files (type definitions, etc.)
+  // add() applies SKIP_PATTERNS — the filter runs here too, just via the helper.
   for (const file of level1Ts) {
     for (const imp of getRelativeImports(file)) {
       const resolved = resolveImport(imp, file);
