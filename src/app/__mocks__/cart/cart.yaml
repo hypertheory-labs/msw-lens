@@ -1,0 +1,50 @@
+# MSW Scenario Manifest
+# This file is the source of truth for what scenarios exist for this endpoint.
+# It is read by msw-lens to populate the scenario switcher.
+# It can also be dropped into an LLM conversation as context.
+
+endpoint: https://store.company.com/user/cart
+method: GET
+shape: collection
+description: Current user's shopping cart items
+
+responseType:
+  name: CartApiItem[]
+  path: src/app/areas/shopping-card/shopping-card-landing/data/cart-store.ts
+
+context:
+  sourceHints:
+    - src/app/areas/shopping-card/shopping-card-landing/data/cart-store.ts
+    - src/app/areas/shopping-card/shopping-card-landing/internal/pages/cart.ts
+
+scenarios:
+  typical:
+    description: Cart with several items — the happy path; verifies each item renders with name, unit price, quantity, and computed total
+    active: true
+
+  empty:
+    description: Cart contains no items — tests whether an empty-state message and call-to-action appear (currently the template has no @empty block; this will render as a blank page body)
+
+  single-item:
+    description: Exactly one item in the cart — edge of the list; tests singular layout and verifies @for renders without a minimum-item assumption
+
+  large-cart:
+    description: Twelve or more items — tests whether the list overflows its container or requires pagination that doesn't exist yet
+
+  slow:
+    description: Simulates a sluggish cart service — tests whether a loading skeleton or spinner appears during fetch (currently no loading state in the template)
+    delay: real
+
+  unauthorized:
+    description: User session has expired — tests whether an auth guard intercepts and redirects to login, or whether the component silently shows an empty cart
+    httpStatus: 401
+
+  server-error:
+    description: Cart service is unavailable — tests whether an error message or fallback UI appears (currently _load() swallows fetch errors silently)
+    httpStatus: 500
+
+  zero-price-item:
+    description: Cart includes a fully discounted item at $0.00 — tests that the currency pipe renders zero gracefully and the line total shows $0.00 rather than blank or NaN
+
+  high-value:
+    description: Items with high unit prices and large quantities — tests that four-to-five digit currency totals don't truncate or overflow the flex layout
