@@ -31,7 +31,7 @@ scenarios:
 
   slow:
     description: Simulates a sluggish auth service — tests loading skeleton states in consuming components
-    delay: realistic
+    delay: real
 
   server-error:
     description: Auth service is unavailable — tests error boundary or fallback UI behavior

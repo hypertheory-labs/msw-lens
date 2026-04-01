@@ -35,7 +35,7 @@ scenarios:
     description: What this tests and why it matters for the UI
     active: true          # only one active at a time
     httpStatus: 401       # optional — omit for 200
-    delay: realistic      # optional — MSW delay mode
+    delay: real      # optional — MSW delay mode
 ```
 
 ## Open Design Questions

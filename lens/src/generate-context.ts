@@ -45,7 +45,7 @@ scenarios:
     description: What UI behavior this tests (not just what the data looks like)
     active: true        # marks the default scenario
     httpStatus: 401     # optional — omit for 200
-    delay: realistic    # optional — MSW delay mode
+    delay: real    # optional — MSW delay mode
 \`\`\`
 `.trim();
 

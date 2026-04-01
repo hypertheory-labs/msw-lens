@@ -11,7 +11,7 @@ const SCENARIO_ARCHETYPES = `
 - \`not-found\` — 404, resource doesn't exist
 - \`unauthorized\` — 401, tests auth guards and login redirect
 - \`server-error\` — 500, tests error boundary or fallback UI
-- \`slow\` — MSW delay:realistic, tests loading/skeleton states
+- \`slow\` — MSW delay('real'), tests loading/skeleton states
 - \`malformed-data\` — response missing optional fields or with unexpected nulls
 
 **Collection endpoints** (array/list responses):
@@ -79,8 +79,9 @@ export function generatePromptFile(
     '1. Identify the HTTP endpoints this component reaches (through its store or service)',
     '2. For each endpoint, generate a `.yaml` manifest in msw-lens format',
     '3. For each endpoint, also generate a handler stub (`.ts`) with a switch statement',
-    '   over the scenario names — match the pattern in the existing manifests',
-    '4. For each scenario, cover: happy path, empty/null states, error conditions',
+    '   over the scenario names — match the pattern in the existing handler files',
+    '4. Register the new handler in `handlers.ts` — match the existing import pattern',
+    '5. For each scenario, cover: happy path, empty/null states, error conditions',
     '   (with appropriate HTTP status codes), slow/timeout, and any edge cases the',
     '   **response type shape** suggests I haven\'t anticipated',
     '',
@@ -102,12 +103,25 @@ export function generatePromptFile(
     lines.push(inlineFile(file, cwd), '');
   }
 
+  // handlers.ts registration file — shows where to register new handlers
+  const handlersPath = join(cwd, 'src/app/__mocks__/handlers.ts');
+  if (existsSync(handlersPath)) {
+    lines.push('---', '', '## Handler registration', '');
+    lines.push(inlineFile(handlersPath, cwd), '');
+  }
+
   if (manifests.length > 0) {
-    lines.push('---', '', '## Existing manifests (pattern reference)', '');
+    lines.push('---', '', '## Existing manifests + handlers (pattern reference)', '');
     for (const m of manifests) {
       const rel = relative(cwd, m._filePath);
       const content = readFileSync(m._filePath, 'utf8');
       lines.push(`### ${basename(m._filePath)}`, `\`${rel}\``, '```yaml', content.trim(), '```', '');
+
+      // Include the sibling handler .ts alongside the manifest
+      const handlerPath = m._filePath.replace(/\.yaml$/, '.ts');
+      if (existsSync(handlerPath)) {
+        lines.push(inlineFile(handlerPath, cwd), '');
+      }
     }
   }
 

@@ -99,7 +99,7 @@ scenarios:
     description: What UI behavior this tests (not just what the data looks like)
     active: true       # default scenario
     httpStatus: 401    # optional
-    delay: realistic   # optional — MSW delay mode
+    delay: real   # optional — MSW delay mode
 ```
 
 ## Open Design Questions
