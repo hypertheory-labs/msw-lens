@@ -32,6 +32,20 @@ Candidates:
 - Story card / ticket reference — optional, gives LLM product intent context
 - Which scenario archetypes to scaffold (checkboxes: happy path, empty, slow, error states)
 
+## Backlog
+
+- **`--only <filter>` flag** — filter the switcher to a subset of endpoints when working
+  with a large number of manifests. Match on endpoint path fragment or manifest directory
+  name (e.g. `--only cart`, `--only /api/user/`). Endpoints not matched stay at their
+  current active scenario, untouched. Build when the pain is real — probably 10+ endpoints.
+
+- **Configurable `__mocks__` root** — currently opinionated to convention. `package.json`
+  config option for projects that deviate. Build when someone needs it.
+
+- **`--only` in lens:context** — analogous filter for context generation. "Generate prompt
+  for just the cart store, even though I have 15 manifests already." Reduces pattern
+  reference bloat as project matures.
+
 ## HMR Mechanism
 msw-lens writes the active scenario selection to `src/app/__mocks__/active-scenarios.ts` — a plain TS module (`Record<string, string>`, keyed by endpoint path). Handlers import it and switch on the value. Vite HMR picks up the file change and hot-reloads. **Verified working.**
 
