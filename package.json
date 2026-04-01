@@ -20,7 +20,8 @@
     "e2e:ui": "npx playwright test --ui",
     "build:schematics": "tsc -p schematics/tsconfig.json && cp schematics/collection.json dist/schematics/ && cp schematics/src/feature-landing/schema.json dist/schematics/src/feature-landing/ && cp -r schematics/src/feature-landing/files dist/schematics/src/feature-landing/ && cp schematics/package.json dist/schematics/",
     "lens": "./lens/node_modules/.bin/tsx lens/src/index.ts",
-    "lens:watch": "./lens/node_modules/.bin/tsx lens/src/index.ts --watch"
+    "lens:watch": "./lens/node_modules/.bin/tsx lens/src/index.ts --watch",
+    "lens:context": "./lens/node_modules/.bin/tsx lens/src/index.ts --context"
   },
   "prettier": {
     "printWidth": 100,

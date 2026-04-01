@@ -14,6 +14,8 @@ export interface Manifest {
   method: string;
   shape?: string;
   description?: string;
+  responseType?: { name: string; path: string };
+  context?: { sourceHints?: string[] };
   scenarios: Record<string, Scenario>;
   _filePath: string;
 }

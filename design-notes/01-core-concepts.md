@@ -3,7 +3,7 @@
 ## The Central Insight (Jeff's, found in conversation)
 The manifest file IS the prompt. Not "fill out the interview, then trigger the LLM." The output of the interview is a structured file that contains everything an LLM needs to generate handlers. The developer drops it in a conversation. No special trigger mechanism needed.
 
-This is the same discovery made in Stellar: design for AI legibility first, and human legibility comes almost for free. The manifest serves both the TUI (reads it to display scenarios) and the LLM (reads it to understand context and generate/critique handlers).
+This is the same discovery made in Stellar: design for AI legibility first, and human legibility comes almost for free. The manifest serves both msw-lens (reads it to display scenarios) and the LLM (reads it to understand context and generate/critique handlers).
 
 ## Two Distinct Modes
 The tool has two conceptually separate functions that happen to live in the same binary:
@@ -11,7 +11,7 @@ The tool has two conceptually separate functions that happen to live in the same
 1. **Creation/Interview mode** - collects information about an endpoint, generates the manifest, possibly scaffolds handler stubs. Probably run once per endpoint by the developer/instructor.
 2. **Operational/Switching mode** - reads the manifest, displays available scenarios, lets the developer switch the active one. This is the "eye doctor" experience. Writes the active scenario selection, HMR picks it up.
 
-In a course context: instructor likely runs interview mode during setup. Students mostly use switching mode.
+In a course context: instructor likely runs interview mode during setup. Students mostly use switching mode (`npm run lens`).
 
 ## The Document vs. Collection Question
 Early in the interview: "Is this a document (single item) or a collection (list)?"
@@ -33,4 +33,6 @@ Candidates:
 - Which scenario archetypes to scaffold (checkboxes: happy path, empty, slow, error states)
 
 ## HMR Mechanism
-TUI writes active scenario name to `src/app/__mocks__/active-scenario.json`. Handlers import that file and switch on the value. Vite HMR picks up the JSON change and hot-reloads. No file dirtying beyond that one JSON file (which should be gitignored or committed as "default scenario").
+msw-lens writes the active scenario selection to `src/app/__mocks__/active-scenarios.ts` — a plain TS module (`Record<string, string>`, keyed by endpoint path). Handlers import it and switch on the value. Vite HMR picks up the file change and hot-reloads. **Verified working.**
+
+Decision to use `.ts` not `.json`: avoids `resolveJsonModule` tsconfig changes; plain TS module that Vite HMR handles naturally. msw-lens regenerates the file from a template on every write — it owns this file entirely.

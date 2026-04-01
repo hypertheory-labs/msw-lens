@@ -10,7 +10,7 @@ This is the confidence baseline for msw-lens's self-description approach. If we 
 ## The Pre-Built Prompt Idea
 "The developer drops this file into a conversation" is passive and loses context. A better first-class workflow:
 
-The TUI has a dedicated output mode — "explain this to Claude" — that generates not just a self-description file but a *pre-built prompt*:
+msw-lens has a dedicated output mode — "explain this to Claude" — that generates not just a self-description file but a *pre-built prompt*:
 
 > "I am working on the invoice history component. I have these scenarios defined: [list]. I am currently seeing [active scenario]. Here is my manifest: [inline]. What scenarios am I missing? What edge cases should I consider?"
 
@@ -23,7 +23,7 @@ Tools that outsource thinking make developers dumber over time. Tools that surfa
 
 This should be a stated principle of the project: **msw-lens is designed to augment developer thinking, not replace it.**
 
-## TUI Output: "Explain This" Mode
+## msw-lens Output: "Explain This" Mode
 Beyond the operational switcher and the creation interview, a third output:
 - Generates a context file + suggested prompt
 - Targeted at any LLM, not just Claude
