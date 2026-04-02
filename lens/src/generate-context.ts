@@ -51,7 +51,7 @@ scenarios:
 
 function getActive(m: Manifest, activeScenarios: Record<string, string>): string {
   return (
-    activeScenarios[m.endpoint] ??
+    activeScenarios[`${m.method} ${m.endpoint}`] ??
     Object.entries(m.scenarios).find(([, s]) => s.active)?.[0] ??
     Object.keys(m.scenarios)[0]
   );

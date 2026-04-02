@@ -14,7 +14,7 @@ const loggedInUser: AuthUser = {
 
 export default [
   http.get('/api/user/', async () => {
-    const scenario = activeScenarios['/api/user/'] ?? 'logged-in';
+    const scenario = activeScenarios['GET /api/user/'] ?? 'logged-in';
 
     switch (scenario) {
       case 'logged-out':

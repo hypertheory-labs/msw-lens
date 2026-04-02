@@ -1,8 +1,6 @@
 import { computed } from '@angular/core';
-import { StatusChangeEvent } from '@angular/forms';
-import { mapToResolve } from '@angular/router';
 import { patchState, signalStore, withComputed, withHooks, withMethods } from '@ngrx/signals';
-import { setEntities, withEntities } from '@ngrx/signals/entities';
+import { removeEntity, setEntities, updateEntity, withEntities } from '@ngrx/signals/entities';
 
 export type CartApiItem = {
   id: string;
@@ -10,6 +8,8 @@ export type CartApiItem = {
   price: number;
   quantity: number;
 };
+
+const BASE = 'https://store.company.com/user/cart';
 
 export const cartStore = signalStore(
   withEntities<CartApiItem>(),
@@ -21,12 +21,48 @@ export const cartStore = signalStore(
     };
   }),
   withMethods((state) => {
+    async function patchQuantity(id: string, quantity: number) {
+      await fetch(`${BASE}/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity }),
+      });
+    }
+
+    async function deleteItem(id: string) {
+      await fetch(`${BASE}/${id}`, { method: 'DELETE' });
+    }
+
     return {
       _load: async () => {
-        const cartItems = (await fetch('https://store.company.com/user/cart').then((res) =>
-          res.json(),
-        )) as CartApiItem[];
+        const cartItems = (await fetch(BASE).then((res) => res.json())) as CartApiItem[];
         patchState(state, setEntities(cartItems));
+      },
+
+      incrementQuantity: async (id: string) => {
+        const item = state.entityMap()[id];
+        if (!item) return;
+        const quantity = item.quantity + 1;
+        patchState(state, updateEntity({ id, changes: { quantity } }));
+        await patchQuantity(id, quantity);
+      },
+
+      decrementQuantity: async (id: string) => {
+        const item = state.entityMap()[id];
+        if (!item) return;
+        if (item.quantity <= 1) {
+          patchState(state, removeEntity(id));
+          await deleteItem(id);
+          return;
+        }
+        const quantity = item.quantity - 1;
+        patchState(state, updateEntity({ id, changes: { quantity } }));
+        await patchQuantity(id, quantity);
+      },
+
+      removeItem: async (id: string) => {
+        patchState(state, removeEntity(id));
+        await deleteItem(id);
       },
     };
   }),

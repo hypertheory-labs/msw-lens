@@ -19,7 +19,7 @@ const largeCartItems: CartApiItem[] = Array.from({ length: 12 }, (_, i) => ({
 
 export default [
   http.get(ENDPOINT, async () => {
-    const scenario = activeScenarios[ENDPOINT] ?? 'typical';
+    const scenario = activeScenarios[`GET ${ENDPOINT}`] ?? 'typical';
 
     switch (scenario) {
       case 'empty':

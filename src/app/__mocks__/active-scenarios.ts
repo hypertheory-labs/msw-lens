@@ -1,11 +1,13 @@
 /**
  * Active scenario selection for MSW handlers.
  * This file is written by msw-lens — do not edit manually.
- * Keys are endpoint paths, values are scenario names defined in the handler.
+ * Keys are "METHOD endpoint", values are scenario names defined in the handler.
  */
 const activeScenarios: Record<string, string> = {
-  '/api/user/': 'logged-in',
-  'https://store.company.com/user/cart': 'large-cart',
+  'GET /api/user/': 'logged-in',
+  'GET https://store.company.com/user/cart': 'typical',
+  'PATCH https://store.company.com/user/cart/:id': 'validation-error',
+  'DELETE https://store.company.com/user/cart/:id': 'slow',
 };
 
 export default activeScenarios;

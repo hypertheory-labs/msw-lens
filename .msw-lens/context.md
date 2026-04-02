@@ -1,5 +1,5 @@
 # msw-lens — project context
-generated: 2026-04-01T16:57:14.394Z
+generated: 2026-04-02T22:22:35.241Z
 
 > Drop this file into any LLM conversation for instant context about what
 > is mocked in this project, what scenarios exist, and what is currently active.
@@ -8,7 +8,9 @@ generated: 2026-04-01T16:57:14.394Z
 
 | endpoint | method | active scenario |
 |----------|--------|-----------------|
-| `https://store.company.com/user/cart` | GET | `large-cart` |
+| `https://store.company.com/user/cart` | GET | `typical` |
+| `https://store.company.com/user/cart/:id` | PATCH | `validation-error` |
+| `https://store.company.com/user/cart/:id` | DELETE | `slow` |
 | `/api/user/` | GET | `logged-in` |
 
 ## Scenario details
@@ -17,15 +19,40 @@ generated: 2026-04-01T16:57:14.394Z
 manifest: `src/app/__mocks__/cart/cart.yaml`
 > Current user's shopping cart items
 
-- **typical** — Cart with several items — the happy path; verifies each item renders with name, unit price, quantity, and computed total
+- **typical** ✓ **(active)** — Cart with several items — the happy path; verifies each item renders with name, unit price, quantity, and computed total
 - **empty** — Cart contains no items — tests whether an empty-state message and call-to-action appear (currently the template has no @empty block; this will render as a blank page body)
 - **single-item** — Exactly one item in the cart — edge of the list; tests singular layout and verifies @for renders without a minimum-item assumption
-- **large-cart** ✓ **(active)** — Twelve or more items — tests whether the list overflows its container or requires pagination that doesn't exist yet
+- **large-cart** — Twelve or more items — tests whether the list overflows its container or requires pagination that doesn't exist yet
 - **slow** *(delay: real)* — Simulates a sluggish cart service — tests whether a loading skeleton or spinner appears during fetch (currently no loading state in the template)
 - **unauthorized** *(401)* — User session has expired — tests whether an auth guard intercepts and redirects to login, or whether the component silently shows an empty cart
 - **server-error** *(500)* — Cart service is unavailable — tests whether an error message or fallback UI appears (currently _load() swallows fetch errors silently)
 - **zero-price-item** — Cart includes a fully discounted item at $0.00 — tests that the currency pipe renders zero gracefully and the line total shows $0.00 rather than blank or NaN
 - **high-value** — Items with high unit prices and large quantities — tests that four-to-five digit currency totals don't truncate or overflow the flex layout
+
+sourceHints:
+- `src/app/areas/shopping-card/shopping-card-landing/data/cart-store.ts`
+- `src/app/areas/shopping-card/shopping-card-landing/internal/pages/cart.ts`
+
+### PATCH `https://store.company.com/user/cart/:id`
+manifest: `src/app/__mocks__/cart/cart-patch.yaml`
+> Update the quantity of a cart item
+
+- **success** — Quantity updated — UI reflects new value and recomputed line total (optimistic update already applied)
+- **validation-error** ✓ **(active)** *(400)* — Invalid quantity in request body — tests whether the UI surfaces a field-level error or silently ignores the failure
+- **server-error** *(500)* — Cart service unavailable — tests whether the optimistic update is rolled back or left as stale UI
+- **slow** *(delay: real)* — Sluggish cart service — tests whether the +/- buttons show a pending state or allow rapid re-clicks
+
+sourceHints:
+- `src/app/areas/shopping-card/shopping-card-landing/data/cart-store.ts`
+- `src/app/areas/shopping-card/shopping-card-landing/internal/pages/cart.ts`
+
+### DELETE `https://store.company.com/user/cart/:id`
+manifest: `src/app/__mocks__/cart/cart-delete.yaml`
+> Remove an item from the current user's cart
+
+- **success** — Item removed — UI removes the row; if cart is now empty, the @empty block should render
+- **server-error** *(500)* — Cart service unavailable — tests whether the optimistic removal is rolled back or the item stays gone from the UI
+- **slow** ✓ **(active)** *(delay: real)* — Sluggish cart service — tests whether the Remove button shows a pending state or allows a second click
 
 sourceHints:
 - `src/app/areas/shopping-card/shopping-card-landing/data/cart-store.ts`
