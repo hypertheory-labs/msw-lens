@@ -43,7 +43,7 @@ async function main() {
     intro('msw-lens — generating context');
     generateContextFile(cwd, manifests, state);
     generatePromptFile(contextFile, cwd, manifests);
-    outro('.msw-lens/context.md and .msw-lens/prompt.md written.');
+    outro('.msw-lens/context.md written. Prompt saved to .msw-lens/prompts/');
     return;
   }
 

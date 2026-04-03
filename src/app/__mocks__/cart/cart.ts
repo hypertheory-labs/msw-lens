@@ -1,6 +1,6 @@
 import { http, HttpHandler, delay, HttpResponse } from 'msw';
 import activeScenarios from '../active-scenarios';
-import { CartApiItem } from '../../areas/shopping-card/shopping-card-landing/data/cart-store';
+import { CartApiItem } from '../../areas/shopping-cart/shopping-cart-landing/data/cart-store';
 
 const ENDPOINT = 'https://store.company.com/user/cart';
 

@@ -16,10 +16,10 @@ const realRoutes: Routes = [
       ),
   },
   {
-    path: 'shopping-card',
+    path: 'shopping-cart',
     loadChildren: () =>
-      import('./areas/shopping-card/shopping-card-landing/shopping-card.routes').then(
-        (r) => r.shoppingCardFeatureRoutes,
+      import('./areas/shopping-cart/shopping-cart-landing/shopping-cart.routes').then(
+        (r) => r.shoppingCartFeatureRoutes,
       ),
   },
 ];

@@ -13,8 +13,8 @@ errorType:
 
 context:
   sourceHints:
-    - src/app/areas/shopping-card/shopping-card-landing/data/cart-store.ts
-    - src/app/areas/shopping-card/shopping-card-landing/internal/pages/cart.ts
+    - src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts
+    - src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/cart.ts
 
 scenarios:
   success:

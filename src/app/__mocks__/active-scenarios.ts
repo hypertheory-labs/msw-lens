@@ -5,7 +5,7 @@
  */
 const activeScenarios: Record<string, string> = {
   'GET /api/user/': 'logged-in',
-  'GET https://store.company.com/user/cart': 'typical',
+  'GET https://store.company.com/user/cart': 'zero-price-item',
   'PATCH https://store.company.com/user/cart/:id': 'validation-error',
   'DELETE https://store.company.com/user/cart/:id': 'slow',
 };

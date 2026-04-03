@@ -4,6 +4,7 @@ import type { Manifest } from './discover.js';
 import { discoverRelatedFiles } from './follow-imports.js';
 
 const LENS_DIR = '.msw-lens';
+const PROMPTS_DIR = join(LENS_DIR, 'prompts');
 
 const SCENARIO_ARCHETYPES = `
 **Document endpoints** (single item responses):
@@ -21,6 +22,15 @@ const SCENARIO_ARCHETYPES = `
 - \`slow\` — tests loading skeleton
 - \`unauthorized\` — 401
 - \`server-error\` — 500
+
+**Mutation endpoints** (POST / PUT / PATCH / DELETE):
+- \`success\` / \`created\` — 201/202/204, happy path; tests UI confirmation, redirect, or form reset
+- \`validation-error\` — 400/422, field-level ProblemDetails; tests whether error messages surface per-field or as a summary
+- \`conflict\` — 409, duplicate or constraint violation; tests whether the UI surfaces a meaningful message
+- \`unauthorized\` — 401, session expired mid-form; tests redirect or inline session error
+- \`forbidden\` — 403, insufficient role; tests whether the UI blocks submission or shows an access error
+- \`server-error\` — 500; tests whether the form retains input and shows a recoverable error message
+- \`slow\` — MSW delay('real'); tests whether the submit button shows a pending/disabled state during submission
 `.trim();
 
 function inlineFile(filePath: string, cwd: string): string {
@@ -55,6 +65,8 @@ export function generatePromptFile(
 ): void {
   const dir = join(cwd, LENS_DIR);
   if (!existsSync(dir)) mkdirSync(dir);
+  const promptsDir = join(cwd, PROMPTS_DIR);
+  if (!existsSync(promptsDir)) mkdirSync(promptsDir);
 
   const timestamp = new Date().toISOString();
   const relEntry = relative(cwd, entryFile);
@@ -142,5 +154,6 @@ export function generatePromptFile(
     ''
   );
 
-  writeFileSync(join(dir, 'prompt.md'), lines.join('\n'), 'utf8');
+  const promptFileName = basename(entryFile).replace(/\.component\.ts$/, '.md').replace(/\.ts$/, '.md');
+  writeFileSync(join(promptsDir, promptFileName), lines.join('\n'), 'utf8');
 }

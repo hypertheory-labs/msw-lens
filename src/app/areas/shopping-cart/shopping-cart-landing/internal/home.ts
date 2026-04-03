@@ -2,10 +2,10 @@ import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 import { SectionLayout, SectionLink } from '@ht/shared/ui-common/layouts/section';
 
 @Component({
-  selector: 'ht-shopping-card-home',
+  selector: 'ht-shopping-cart-home',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [SectionLayout],
-  template: `<app-ui-section-layout title="Shopping Card" [links]="links()" />`,
+  template: `<app-ui-section-layout title="Shopping Cart" [links]="links()" />`,
   styles: ``,
 })
 export class Home {
@@ -13,6 +13,10 @@ export class Home {
     {
       path: 'cart',
       title: 'Your Cart',
+    },
+    {
+      path: 'add-product',
+      title: 'Add Product',
     },
   ]);
 }
