@@ -1,0 +1,49 @@
+# MSW Scenario Manifest
+# This file is the source of truth for what scenarios exist for this endpoint.
+# It is read by msw-lens to populate the scenario switcher.
+# It can also be dropped into an LLM conversation as context.
+
+endpoint: https://store.company.com/products
+method: POST
+description: Create a new product in the catalog
+
+responseType:
+  name: ProductApiItem
+  path: src/app/areas/shopping-cart/shopping-cart-landing/data/product-store.ts
+
+errorType:
+  name: ProblemDetails
+  path: src/app/areas/shared/util-types/problem-details.ts
+
+context:
+  sourceHints:
+    - src/app/areas/shopping-cart/shopping-cart-landing/data/product-store.ts
+    - src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/add-product.ts
+
+scenarios:
+  created:
+    description: Product created successfully — tests that all four form fields clear on reset and the product count in the header increments by one
+    active: true
+
+  slow:
+    description: Server takes several seconds to respond — tests whether the Create Product button shows a pending/disabled state during submission (currently no pending state; rapid re-clicks can submit duplicates)
+    delay: real
+
+  validation-error:
+    description: Server rejects the submitted payload — tests whether the component surfaces the server-side error message or silently swallows the failure (createProduct() currently has no error handling)
+    httpStatus: 422
+
+  conflict:
+    description: A product with that name already exists in the catalog — tests whether a "duplicate product" message appears or the failure is swallowed and the user gets no feedback
+    httpStatus: 409
+
+  unauthorized:
+    description: Session expired while the user was filling in the form — tests whether the page redirects to login or the Create Product button silently stops working
+    httpStatus: 401
+
+  server-error:
+    description: Catalog service is unavailable at submission time — tests whether the form retains all four field values and shows a recoverable error (currently the failure is swallowed silently)
+    httpStatus: 500
+
+  reset-to-zero:
+    description: Successful creation followed by a form reset — tests whether the numeric price and cost inputs display "0" after reset or render as NaN/blank (signals-based form reset may produce undefined for number fields)

@@ -1,14 +1,15 @@
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join, relative } from 'path';
 import type { Manifest } from './discover.js';
+import type { LensConfig } from './config.js';
 
 const LENS_DIR = '.msw-lens';
 
-const HOW_IT_WORKS = `
-## How msw-lens works
+function howItWorks(config: LensConfig): string {
+  return `## How msw-lens works
 
 msw-lens reads scenario manifests — YAML files co-located with MSW handlers in \`__mocks__\`
-directories — and writes the active selection to \`src/app/__mocks__/active-scenarios.ts\`.
+directories — and writes the active selection to \`${config.mocksDir}/active-scenarios.ts\`.
 Vite HMR picks up that file change immediately. No browser refresh needed.
 
 \`active-scenarios.ts\` is **tool-owned**. Do not edit it manually; msw-lens regenerates it
@@ -21,6 +22,7 @@ on every run.
 
 Manifests live alongside handlers: \`auth/user.yaml\` next to \`auth/user.ts\`.
 `.trim();
+}
 
 const MANIFEST_FORMAT = `
 ## Manifest format
@@ -65,7 +67,8 @@ function getActive(m: Manifest, activeScenarios: Record<string, string>): string
 export function generateContextFile(
   cwd: string,
   manifests: Manifest[],
-  activeScenarios: Record<string, string>
+  activeScenarios: Record<string, string>,
+  config: LensConfig
 ): void {
   const dir = join(cwd, LENS_DIR);
   if (!existsSync(dir)) mkdirSync(dir);
@@ -124,7 +127,7 @@ export function generateContextFile(
     }
   }
 
-  lines.push('---', '', HOW_IT_WORKS, '', '---', '', MANIFEST_FORMAT, '');
+  lines.push('---', '', howItWorks(config), '', '---', '', MANIFEST_FORMAT, '');
 
   writeFileSync(join(dir, 'context.md'), lines.join('\n'), 'utf8');
 }

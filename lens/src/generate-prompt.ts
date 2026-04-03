@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { basename, join, relative } from 'path';
 import type { Manifest } from './discover.js';
+import type { LensConfig } from './config.js';
 import { discoverRelatedFiles } from './follow-imports.js';
 
 const LENS_DIR = '.msw-lens';
@@ -61,7 +62,8 @@ function deriveComponentName(filePath: string): string {
 export function generatePromptFile(
   entryFile: string,
   cwd: string,
-  manifests: Manifest[]
+  manifests: Manifest[],
+  config: LensConfig
 ): void {
   const dir = join(cwd, LENS_DIR);
   if (!existsSync(dir)) mkdirSync(dir);
@@ -83,7 +85,7 @@ export function generatePromptFile(
     '',
     '## The ask',
     '',
-    `I'm working on the \`${compName}\` component in an Angular application and want to`,
+    `I'm working on the \`${compName}\` component in a web application and want to`,
     'create MSW mock scenarios for the endpoints it depends on.',
     '',
     'Based on the source files below, please:',
@@ -121,7 +123,7 @@ export function generatePromptFile(
   }
 
   // handlers.ts registration file — shows where to register new handlers
-  const handlersPath = join(cwd, 'src/app/__mocks__/handlers.ts');
+  const handlersPath = join(cwd, config.mocksDir, 'handlers.ts');
   if (existsSync(handlersPath)) {
     lines.push('---', '', '## Handler registration', '');
     lines.push(inlineFile(handlersPath, cwd), '');

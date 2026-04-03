@@ -1,0 +1,41 @@
+# MSW Scenario Manifest
+# This file is the source of truth for what scenarios exist for this endpoint.
+# It is read by msw-lens to populate the scenario switcher.
+# It can also be dropped into an LLM conversation as context.
+
+endpoint: /api/user/
+method: GET
+shape: document  # document | collection
+description: Currently authenticated user profile
+
+responseType:
+  name: AuthUser
+  path: src/app/areas/shared/util-auth/internal/types.ts
+
+# sourceHints: paths to files that consume or depend on this endpoint.
+# An LLM will read these to understand what scenarios are worth testing.
+# You provide the pointers — the LLM derives the meaning.
+context:
+  sourceHints:
+    - src/app/areas/shared/util-auth/store.ts
+    - src/app/areas/shared/util-auth/internal/types.ts
+
+scenarios:
+  logged-in:
+    description: Authenticated user with Student and Employee roles — the happy path
+    active: true
+
+  logged-out:
+    description: No active session — tests that auth guards redirect correctly and login UI appears
+    httpStatus: 401
+
+  slow:
+    description: Simulates a sluggish auth service — tests loading skeleton states in consuming components
+    delay: real
+
+  server-error:
+    description: Auth service is unavailable — tests error boundary or fallback UI behavior
+    httpStatus: 500
+
+  admin:
+    description: User with an elevated Admin role — tests role-based UI variations (nav items, gated features)

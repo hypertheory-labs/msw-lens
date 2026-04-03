@@ -1,12 +1,13 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import type { LensConfig } from './config.js';
 
-// Convention: active-scenarios.ts lives at the root of the __mocks__ directory.
-// This is opinionated — configuration support is a future backlog item.
-const STATE_PATH = 'src/app/__mocks__/active-scenarios.ts';
+function statePath(config: LensConfig): string {
+  return join(config.mocksDir, 'active-scenarios.ts');
+}
 
-export function readActiveScenarios(cwd: string): Record<string, string> {
-  const fullPath = join(cwd, STATE_PATH);
+export function readActiveScenarios(cwd: string, config: LensConfig): Record<string, string> {
+  const fullPath = join(cwd, statePath(config));
   try {
     const content = readFileSync(fullPath, 'utf8');
     const match = content.match(/=\s*\{([^}]*)\}/);
@@ -22,8 +23,8 @@ export function readActiveScenarios(cwd: string): Record<string, string> {
   }
 }
 
-export function writeActiveScenarios(cwd: string, selections: Record<string, string>): void {
-  const fullPath = join(cwd, STATE_PATH);
+export function writeActiveScenarios(cwd: string, config: LensConfig, selections: Record<string, string>): void {
+  const fullPath = join(cwd, statePath(config));
   const entries = Object.entries(selections)
     .map(([k, v]) => `  '${k}': '${v}',`)
     .join('\n');
