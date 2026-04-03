@@ -1,5 +1,5 @@
 # msw-lens context
-generated: 2026-04-03T14:59:17.270Z
+generated: 2026-04-03T15:56:33.869Z
 entry: src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/add-product.ts
 
 ---
@@ -27,6 +27,11 @@ cart message appears and the checkout button disables."
 Use the format and vocabulary from the existing manifests below. If you notice
 anything in the component or template that suggests a scenario I should consider
 but haven't asked about — flag it.
+
+If the provided files are incomplete — init methods with no visible call site,
+protected routes with no guard in scope, dependencies that seem to come from
+outside what was crawled — **list your assumptions explicitly** rather than
+silently filling the gaps.
 
 ---
 
@@ -628,3 +633,12 @@ Scenario archetypes to consider:
 - `slow` — tests loading skeleton
 - `unauthorized` — 401
 - `server-error` — 500
+
+**Mutation endpoints** (POST / PUT / PATCH / DELETE):
+- `success` / `created` — 201/202/204, happy path; tests UI confirmation, redirect, or form reset
+- `validation-error` — 400/422, field-level ProblemDetails; tests whether error messages surface per-field or as a summary
+- `conflict` — 409, duplicate or constraint violation; tests whether the UI surfaces a meaningful message
+- `unauthorized` — 401, session expired mid-form; tests redirect or inline session error
+- `forbidden` — 403, insufficient role; tests whether the UI blocks submission or shows an access error
+- `server-error` — 500; tests whether the form retains input and shows a recoverable error message
+- `slow` — MSW delay('real'); tests whether the submit button shows a pending/disabled state during submission
