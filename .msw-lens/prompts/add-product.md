@@ -1,12 +1,12 @@
 # msw-lens context
-generated: 2026-04-03T15:56:33.869Z
+generated: 2026-04-03T16:46:12.838Z
 entry: src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/add-product.ts
 
 ---
 
 ## The ask
 
-I'm working on the `AddProduct` component in an Angular application and want to
+I'm working on the `AddProduct` component in a web application and want to
 create MSW mock scenarios for the endpoints it depends on.
 
 Based on the source files below, please:
