@@ -56,3 +56,8 @@ storybook-static
 # Generated documentation
 documentation.json
 deps-report.html
+
+
+
+.nx/cache
+.nx/workspace-data

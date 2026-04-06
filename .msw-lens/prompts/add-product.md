@@ -1,5 +1,5 @@
 # msw-lens context
-generated: 2026-04-03T16:46:12.838Z
+generated: 2026-04-06T21:59:10.852Z
 entry: src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/add-product.ts
 
 ---
@@ -610,7 +610,7 @@ export default [
 
 ## About msw-lens
 
-msw-lens manages MSW scenario switching for Angular development. Manifests live
+msw-lens manages MSW scenario switching for web development. Manifests live
 alongside handlers in `__mocks__` directories. The active scenario is written to
 `src/app/__mocks__/active-scenarios.ts` — Vite HMR picks it up immediately.
 

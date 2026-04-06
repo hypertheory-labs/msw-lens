@@ -1,5 +1,4 @@
 {
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=827846
   "recommendations": [
     "angular.ng-template",
     "l13rary.l13-diff",
@@ -14,6 +13,7 @@
     "wenfangdu.snippet-generator",
     "bradlc.vscode-tailwindcss",
     "orta.vscode-twoslash-queries",
-    "vitest.explorer"
+    "vitest.explorer",
+    "nrwl.angular-console"
   ]
 }

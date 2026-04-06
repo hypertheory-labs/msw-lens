@@ -10,12 +10,12 @@ description: Current user's shopping cart items
 
 responseType:
   name: CartApiItem[]
-  path: src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts
+  path: apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts
 
 context:
   sourceHints:
-    - src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts
-    - src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/cart.ts
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/cart.ts
 
 scenarios:
   typical:

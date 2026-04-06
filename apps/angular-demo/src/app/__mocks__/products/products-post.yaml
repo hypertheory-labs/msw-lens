@@ -9,25 +9,25 @@ description: Create a new product — expects name, description, price, cost; re
 
 responseType:
   name: ProductApiItem
-  path: src/app/areas/shopping-cart/shopping-cart-landing/data/product-store.ts
+  path: apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/data/product-store.ts
 
 errorType:
   name: ProblemDetails
-  path: src/app/areas/shared/util-types/problem-details.ts
+  path: apps/angular-demo/src/app/areas/shared/util-types/problem-details.ts
 
 context:
   sourceHints:
-    - src/app/areas/shopping-cart/shopping-cart-landing/data/product-store.ts
-    - src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/add-product.ts
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/data/product-store.ts
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/add-product.ts
   hints:
-    - "Client-side validates: name required, description required, price > cost. Server-side
+    - 'Client-side validates: name required, description required, price > cost. Server-side
       validation may enforce additional constraints (negative values, zero price, max length)
-      that the form does not."
-    - "createProduct() does not catch fetch errors. On any non-2xx response, the store still
+      that the form does not.'
+    - 'createProduct() does not catch fetch errors. On any non-2xx response, the store still
       calls patchState(addEntity(...)) with whatever res.json() returns — likely an error body
       masquerading as a ProductApiItem. The form also resets unconditionally after await, so
-      a 500 response will silently clear the form as if the product was created."
-    - "The submit button has no pending or disabled state — rapid double-submission is possible."
+      a 500 response will silently clear the form as if the product was created.'
+    - 'The submit button has no pending or disabled state — rapid double-submission is possible.'
 
 scenarios:
   created:

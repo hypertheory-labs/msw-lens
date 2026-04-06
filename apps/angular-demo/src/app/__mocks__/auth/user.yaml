@@ -10,15 +10,15 @@ description: Currently authenticated user profile
 
 responseType:
   name: AuthUser
-  path: src/app/areas/shared/util-auth/internal/types.ts
+  path: apps/angular-demo/src/app/areas/shared/util-auth/internal/types.ts
 
 # sourceHints: paths to files that consume or depend on this endpoint.
 # An LLM will read these to understand what scenarios are worth testing.
 # You provide the pointers — the LLM derives the meaning.
 context:
   sourceHints:
-    - src/app/areas/shared/util-auth/store.ts
-    - src/app/areas/shared/util-auth/internal/types.ts
+    - apps/angular-demo/src/app/areas/shared/util-auth/store.ts
+    - apps/angular-demo/src/app/areas/shared/util-auth/internal/types.ts
 
 scenarios:
   logged-in:

@@ -1,0 +1,128 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "angular-demo",
+  "projectType": "application",
+  "generators": {
+    "@schematics/angular:component": {
+      "inlineTemplate": true,
+      "inlineStyle": true,
+      "skipTests": true
+    },
+    "@schematics/angular:class": {
+      "skipTests": true
+    },
+    "@schematics/angular:directive": {
+      "skipTests": true
+    },
+    "@schematics/angular:guard": {
+      "skipTests": true
+    },
+    "@schematics/angular:interceptor": {
+      "skipTests": true
+    },
+    "@schematics/angular:pipe": {
+      "skipTests": true
+    },
+    "@schematics/angular:resolver": {
+      "skipTests": true
+    },
+    "@schematics/angular:service": {
+      "skipTests": true
+    }
+  },
+  "sourceRoot": "apps/angular-demo/src",
+  "prefix": "app",
+  "targets": {
+    "test": {
+      "executor": "@angular/build:unit-test",
+      "options": {
+        "runnerConfig": "apps/angular-demo/vitest.config.ts"
+      }
+    },
+    "build": {
+      "executor": "@angular/build:application",
+      "options": {
+        "browser": "apps/angular-demo/src/main.ts",
+        "tsConfig": "apps/angular-demo/tsconfig.app.json",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/angular-demo/public"
+          }
+        ],
+        "styles": [
+          "apps/angular-demo/src/styles.css"
+        ],
+        "scripts": [],
+        "outputPath": "dist/apps/angular-demo"
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kB",
+              "maximumError": "1MB"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "4kB",
+              "maximumError": "8kB"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "fileReplacements": [
+            {
+              "replace": "apps/angular-demo/src/environments/environment.ts",
+              "with": "apps/angular-demo/src/environments/environment.development.ts"
+            }
+          ]
+        }
+      },
+      "defaultConfiguration": "production",
+      "outputs": [
+        "{options.outputPath}"
+      ]
+    },
+    "serve": {
+      "executor": "@angular/build:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "angular-demo:build:production"
+        },
+        "development": {
+          "buildTarget": "angular-demo:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "lint": {
+      "executor": "@angular-eslint/builder:lint",
+      "options": {
+        "lintFilePatterns": [
+          "apps/angular-demo/src/**/*.ts",
+          "apps/angular-demo/src/**/*.html"
+        ]
+      },
+      "outputs": [
+        "{options.outputFile}"
+      ]
+    },
+    "e2e": {
+      "executor": "playwright-ng-schematics:playwright",
+      "options": {
+        "devServerTarget": "angular-demo:serve"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "angular-demo:serve:production"
+        }
+      }
+    }
+  }
+}

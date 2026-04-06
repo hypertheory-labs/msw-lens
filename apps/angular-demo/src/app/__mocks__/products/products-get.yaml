@@ -10,12 +10,12 @@ description: Full product catalogue — name, description, price, cost per item
 
 responseType:
   name: ProductApiItem[]
-  path: src/app/areas/shopping-cart/shopping-cart-landing/data/product-store.ts
+  path: apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/data/product-store.ts
 
 context:
   sourceHints:
-    - src/app/areas/shopping-cart/shopping-cart-landing/data/product-store.ts
-    - src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/add-product.ts
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/data/product-store.ts
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/add-product.ts
   hints:
     - "_load() has no visible call site in the AddProduct component — it is likely called
       from a route resolver or parent. The component renders store.entities().length, so

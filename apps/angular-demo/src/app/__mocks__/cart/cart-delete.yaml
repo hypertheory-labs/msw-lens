@@ -9,12 +9,12 @@ description: Remove an item from the current user's cart
 
 errorType:
   name: ProblemDetails
-  path: src/app/areas/shared/util-types/problem-details.ts
+  path: apps/angular-demo/src/app/areas/shared/util-types/problem-details.ts
 
 context:
   sourceHints:
-    - src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts
-    - src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/cart.ts
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/cart.ts
 
 scenarios:
   success:

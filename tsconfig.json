@@ -5,7 +5,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@ht/*": ["src/app/areas/*"]
+      "@ht/*": ["apps/angular-demo/src/app/areas/*"]
     },
 
     "strict": true,
@@ -29,7 +29,7 @@
   "files": [],
   "references": [
     {
-      "path": "./tsconfig.app.json"
+      "path": "./apps/angular-demo/tsconfig.app.json"
     }
   ]
 }
