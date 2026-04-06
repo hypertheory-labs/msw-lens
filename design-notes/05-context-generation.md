@@ -34,9 +34,16 @@ Output: `.msw-lens/prompt.md` — committed, tool-owned, regenerated on each cal
 ## File Discovery Strategy
 Starting from the entry component:
 1. Component `.ts` — always included
-2. Component `.html` — always included if exists (this is where failure modes live)
+2. Sibling template file — included if exists. Extension is configurable (`templateExtension` in
+   `package.json` `msw-lens` key). Default `.html` for Angular; set to `null` for React (inline JSX).
+   Vue SFCs need a different approach (the entry file is `.vue`, not `.ts`).
 3. Stores/services imported by the component — follow relative imports only, skip node_modules
 4. Type files imported by those stores/services — one more level deep
+
+Skip patterns (framework-neutral): `.spec.ts` test files and `index.ts` barrel files.
+Previously included Angular-specific skips (`.module.ts`, `.routing.ts`, `.routes.ts`) —
+removed; modern standalone Angular components don't import these, and other frameworks shouldn't
+skip them by default. Bias toward inclusion: too much context degrades gracefully, too little fails silently.
 
 Typically 3-5 files total. **Full contents always. No summaries, no excerpts.**
 
@@ -51,7 +58,7 @@ entry: <relative path to component>
 
 ## The ask
 
-I'm working on the <ComponentName> component in an Angular application and want to
+I'm working on the <ComponentName> component in a web application and want to
 create MSW mock scenarios for the endpoints it depends on.
 
 Based on the source files below:
@@ -93,9 +100,10 @@ Use the format and vocabulary shown in the existing manifests below.
 
 ## About msw-lens
 
-msw-lens manages MSW scenario switching for Angular development. Manifests live
+msw-lens manages MSW scenario switching for web development. Manifests live
 alongside handlers in `__mocks__` directories. The active scenario is written to
-`src/app/__mocks__/active-scenarios.ts` — Vite HMR picks it up immediately.
+`<config.mocksDir>/active-scenarios.ts` — Vite HMR picks it up immediately.
+(Path comes from `msw-lens.mocksDir` in `package.json`; default `src/__mocks__`.)
 
 Scenario archetypes to consider:
 

@@ -3,11 +3,8 @@ import { basename, dirname, join } from 'path';
 
 // Files we don't want to pull into LLM context — noise, not signal
 const SKIP_PATTERNS = [
-  /\.spec\.ts$/,
-  /\.module\.ts$/,
-  /\.routing\.ts$/,
-  /\.routes\.ts$/,
-  /\/index\.ts$/,
+  /\.spec\.ts$/,   // test files — never useful
+  /\/index\.ts$/, // barrel files — just re-exports, no content
 ];
 
 function shouldSkip(filePath: string): boolean {
@@ -37,14 +34,14 @@ function getRelativeImports(filePath: string): string[] {
  * Starting from a component .ts file, discover the related files an LLM
  * needs to understand what the component does and what it expects from the API:
  *
- *   Level 0 — the component itself + its .html template
+ *   Level 0 — the component itself + its sibling template (if templateExtension is set)
  *   Level 1 — direct relative imports (stores, services, local types)
  *   Level 2 — relative imports from level-1 files (type definitions, interfaces)
  *
- * Only follows relative imports — node_modules and Angular framework files
- * are excluded automatically. Skips spec, module, and routing files.
+ * Only follows relative imports — node_modules are excluded automatically.
+ * Skips spec files and barrel index files.
  */
-export function discoverRelatedFiles(entryTs: string): string[] {
+export function discoverRelatedFiles(entryTs: string, templateExtension: string | null = '.html'): string[] {
   const collected: string[] = [];
   const seen = new Set<string>();
 
@@ -55,10 +52,12 @@ export function discoverRelatedFiles(entryTs: string): string[] {
     }
   }
 
-  // Level 0: entry file + sibling HTML template
+  // Level 0: entry file + sibling template (if framework uses a separate template file)
   add(entryTs);
-  const htmlPath = entryTs.replace(/\.ts$/, '.html');
-  if (existsSync(htmlPath)) add(htmlPath);
+  if (templateExtension) {
+    const templatePath = entryTs.replace(/\.ts$/, templateExtension);
+    if (existsSync(templatePath)) add(templatePath);
+  }
 
   // Level 1: direct imports from the entry
   const level1Ts: string[] = [];

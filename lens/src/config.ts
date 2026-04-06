@@ -3,10 +3,12 @@ import { join } from 'path';
 
 export interface LensConfig {
   mocksDir: string;
+  templateExtension: string | null; // e.g. '.html' for Angular, null for React (inline JSX)
 }
 
 const DEFAULTS: LensConfig = {
   mocksDir: 'src/__mocks__',
+  templateExtension: '.html',
 };
 
 export function readConfig(cwd: string): LensConfig {

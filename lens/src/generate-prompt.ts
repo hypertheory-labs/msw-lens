@@ -74,7 +74,7 @@ export function generatePromptFile(
   const relEntry = relative(cwd, entryFile);
   const compName = deriveComponentName(entryFile);
 
-  const relatedFiles = discoverRelatedFiles(entryFile);
+  const relatedFiles = discoverRelatedFiles(entryFile, config.templateExtension);
 
   const lines: string[] = [
     '# msw-lens context',
@@ -149,9 +149,9 @@ export function generatePromptFile(
     '',
     '## About msw-lens',
     '',
-    'msw-lens manages MSW scenario switching for Angular development. Manifests live',
-    'alongside handlers in `__mocks__` directories. The active scenario is written to',
-    '`src/app/__mocks__/active-scenarios.ts` — Vite HMR picks it up immediately.',
+    'msw-lens manages MSW scenario switching for web development. Manifests live',
+    `alongside handlers in \`__mocks__\` directories. The active scenario is written to`,
+    `\`${config.mocksDir}/active-scenarios.ts\` — Vite HMR picks it up immediately.`,
     '',
     '`active-scenarios.ts` is tool-owned. Do not include instructions to edit it manually.',
     '',
