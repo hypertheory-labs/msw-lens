@@ -1,0 +1,60 @@
+# MSW Scenario Manifest
+# This file is the source of truth for what scenarios exist for this endpoint.
+# It is read by msw-lens to populate the scenario switcher.
+# It can also be dropped into an LLM conversation as context.
+
+endpoint: https://store.company.com/products
+method: POST
+description: Create a new product — expects name, description, price, cost; returns the created item with a server-assigned id
+
+responseType:
+  name: ProductApiItem
+  path: src/app/areas/shopping-cart/shopping-cart-landing/data/product-store.ts
+
+errorType:
+  name: ProblemDetails
+  path: src/app/areas/shared/util-types/problem-details.ts
+
+context:
+  sourceHints:
+    - src/app/areas/shopping-cart/shopping-cart-landing/data/product-store.ts
+    - src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/add-product.ts
+  hints:
+    - "Client-side validates: name required, description required, price > cost. Server-side
+      validation may enforce additional constraints (negative values, zero price, max length)
+      that the form does not."
+    - "createProduct() does not catch fetch errors. On any non-2xx response, the store still
+      calls patchState(addEntity(...)) with whatever res.json() returns — likely an error body
+      masquerading as a ProductApiItem. The form also resets unconditionally after await, so
+      a 500 response will silently clear the form as if the product was created."
+    - "The submit button has no pending or disabled state — rapid double-submission is possible."
+
+scenarios:
+  created:
+    description: Product created successfully — form resets, product count increments by one
+    active: true
+    httpStatus: 201
+
+  validation-error:
+    description: Server rejects the submission — tests whether ProblemDetails errors surface in the UI (currently no server-error handling in the template; form will silently reset)
+    httpStatus: 422
+
+  conflict:
+    description: A product with this name already exists — tests whether the UI surfaces the 409 conflict message or silently clears the form
+    httpStatus: 409
+
+  unauthorized:
+    description: Session expired mid-form — tests whether an auth guard intercepts or the form fails silently
+    httpStatus: 401
+
+  forbidden:
+    description: User lacks permission to create products — tests whether a 403 is surfaced or silently swallowed (no role-gating visible in the template)
+    httpStatus: 403
+
+  server-error:
+    description: Product service unavailable — currently createProduct() will reset the form anyway, making it appear the product was created; tests whether this silent failure is acceptable
+    httpStatus: 500
+
+  slow:
+    description: Sluggish product service — tests whether the Create Product button shows a pending/disabled state during submission (currently it does not)
+    delay: real
