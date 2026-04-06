@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://unpkg.com/@hypertheory-labs/msw-lens/schema/manifest.schema.json",
+  "title": "msw-lens Scenario Manifest",
+  "description": "Describes the scenarios for a single MSW mock endpoint. Used by msw-lens for scenario switching and LLM context generation.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["endpoint", "method", "scenarios"],
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "markdownDescription": "The URL or path pattern this handler matches. Can be a full URL (`https://api.example.com/user/cart`) or a path (`/api/cart`). MSW path parameters use `:param` syntax.\n\n**Examples:**\n- `/api/user/`\n- `https://store.company.com/user/cart/:id`"
+    },
+    "method": {
+      "type": "string",
+      "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
+      "markdownDescription": "HTTP method this handler responds to."
+    },
+    "shape": {
+      "type": "string",
+      "enum": ["document", "collection"],
+      "markdownDescription": "The response shape — helps msw-lens suggest appropriate scenario archetypes.\n\n- `document` — single item (user profile, cart item, product)\n- `collection` — array/list (cart items, product list, search results)"
+    },
+    "description": {
+      "type": "string",
+      "markdownDescription": "Human-readable description of what this endpoint returns. Used in `context.md` and the generated LLM prompt."
+    },
+    "responseType": {
+      "type": "object",
+      "additionalProperties": true,
+      "markdownDescription": "The TypeScript type that describes a successful response from this endpoint. Used by `lens:context` to pull the type definition into the generated prompt.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "markdownDescription": "TypeScript type or interface name (e.g. `AuthUser`, `CartApiItem[]`)."
+        },
+        "path": {
+          "type": "string",
+          "markdownDescription": "Path to the file containing this type, relative to the project root."
+        },
+        "openApiSpec": {
+          "type": "string",
+          "markdownDescription": "Path or URL to an OpenAPI spec that describes this endpoint. When present, `lens:context` will include the relevant schema section in the generated prompt.\n\n**Examples:**\n- `../openapi.yaml`\n- `https://api.example.com/openapi.json`"
+        },
+        "openApiRef": {
+          "type": "string",
+          "markdownDescription": "JSON pointer to the schema within the OpenAPI spec (e.g. `#/components/schemas/CartItem`)."
+        }
+      }
+    },
+    "errorType": {
+      "type": "object",
+      "additionalProperties": true,
+      "markdownDescription": "The TypeScript type that describes error responses from this endpoint (4xx/5xx). Common pattern: RFC 9457 `ProblemDetails`.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "markdownDescription": "TypeScript type or interface name (e.g. `ProblemDetails`)."
+        },
+        "path": {
+          "type": "string",
+          "markdownDescription": "Path to the file containing this type, relative to the project root."
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": true,
+      "markdownDescription": "Additional context hints for LLM consumption. These don't change how the switcher works — they shape what gets included in the generated prompt.",
+      "properties": {
+        "sourceHints": {
+          "type": "array",
+          "items": { "type": "string" },
+          "markdownDescription": "Paths to files that consume or depend on this endpoint — stores, components, services. `lens:context` inlines these into the generated prompt.\n\nUse this when the import crawl from the entry component doesn't naturally reach a file that matters (e.g. a route guard, a shared auth store, a sibling component)."
+        },
+        "hints": {
+          "type": "array",
+          "items": { "type": "string" },
+          "markdownDescription": "Free-form annotations for the LLM — things the code doesn't make obvious.\n\n**Examples:**\n- `\"This endpoint is behind an auth guard — 401 always redirects to /login\"`\n- `\"The UI uses optimistic updates — the store mutates before this response arrives\"`\n- `\"quantity must be between 1 and 99\"`"
+        }
+      }
+    },
+    "scenarios": {
+      "type": "object",
+      "markdownDescription": "The scenarios available for this endpoint. Each key is a scenario name — use kebab-case. At most one scenario should have `active: true`; that's the default when msw-lens starts.\n\n**Common scenario names by shape:**\n\n*Document:* `happy-path`, `not-found`, `unauthorized`, `server-error`, `slow`, `malformed-data`\n\n*Collection:* `typical`, `empty`, `overloaded`, `slow`, `unauthorized`, `server-error`\n\n*Mutation:* `success`, `created`, `validation-error`, `conflict`, `unauthorized`, `forbidden`, `server-error`, `slow`",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "description": {
+            "type": "string",
+            "markdownDescription": "What UI behavior this scenario tests — not what the data looks like.\n\n**Good:** `\"Tests that the empty cart message appears and the checkout button disables\"`\n\n**Avoid:** `\"Returns an empty items array\"`"
+          },
+          "active": {
+            "type": "boolean",
+            "markdownDescription": "Marks this as the default scenario. msw-lens starts with this scenario selected. Only one scenario per manifest should be `active: true`."
+          },
+          "httpStatus": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 599,
+            "markdownDescription": "HTTP status code for this scenario. When omitted, the handler returns 200.\n\n**Common values:** `200`, `201`, `202`, `204`, `400`, `401`, `403`, `404`, `409`, `422`, `500`"
+          },
+          "delay": {
+            "type": "string",
+            "markdownDescription": "MSW delay mode for this scenario.\n\n- `real` — realistic network latency simulation\n- `infinite` — request never resolves (tests timeout UI)\n\nOr an integer string for a fixed millisecond delay: `\"2000\"`"
+          }
+        }
+      }
+    }
+  }
+}

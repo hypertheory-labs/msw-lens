@@ -21,6 +21,9 @@
     "source.format": "always"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "yaml.schemas": {
+    "./lens/schema/manifest.schema.json": "**/__mocks__/**/*.yaml"
+  },
   "cSpell.words": [
     "daisyui",
     "Hypertheory",
