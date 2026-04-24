@@ -58,6 +58,12 @@ EOF
   echo "  $app — scrubbed ($mocks_dir/)"
 done
 
+# Commit the scrub so `git switch main` can't accidentally carry the
+# deletions back. Without this, switching branches leaves the scrubbed
+# state in the working tree whenever there are no conflicts.
+git add -A
+git commit -m "demo: clean slate for $branch_name" --quiet
+
 echo ""
 echo "ready. demo branch: $branch_name"
 echo ""
@@ -67,5 +73,7 @@ echo "  npm run lens:context -- src/path/to/component.ts"
 echo "  # ... demo ..."
 echo ""
 echo "when done:"
-echo "  git add -A && git commit -m 'demo: <what you showed>'   # optional record"
-echo "  git switch main"
+echo "  git add -A && git commit -m 'demo: <what you showed>'   # optional: record the result"
+echo "  git switch main                                         # safe — the scrub is already committed"
+echo ""
+echo "to delete the demo branch later:  git branch -D $branch_name"
