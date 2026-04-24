@@ -152,6 +152,7 @@ scenarios:
 - Creation/interview mode: how does the developer bootstrap the first manifest for an endpoint?
 - Should `lens:context` also suggest Playwright tests? (Stellar's cold-instance found a race condition unprompted — this capability exists if we frame the ask right)
 - Multi-endpoint components: one prompt file covering all endpoints, or one per endpoint?
+- **`shape` field is ambiguous for wrapped-envelope responses.** Every cold Claude labels Cart as `shape: document` even though `{ items: [], total: N }` contains a collection. The envelope IS a document; the payload IS a collection. Options for 0.2.0: rename the field, add `shape: mixed`, or split into `envelope` + `payload`. Defer until Vue demo forces the issue or a clearer pattern emerges.
 
 ## Tech Decisions
 
