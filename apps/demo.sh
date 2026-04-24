@@ -49,8 +49,19 @@ import { HttpHandler } from 'msw';
 export const handlers: HttpHandler[] = [];
 EOF
 
-  # Remove msw-lens runtime state.
-  rm -f "$mocks_dir/active-scenarios.ts"
+  # Reset active-scenarios.ts to an empty stub — keep the file so any
+  # newly-generated handler can import from it without a compile error.
+  # The first `npm run lens` overwrites this with real selections.
+  cat > "$mocks_dir/active-scenarios.ts" <<'EOF'
+/**
+ * Active scenario selection for MSW handlers.
+ * This file is written by msw-lens — do not edit manually.
+ * Keys are "METHOD endpoint", values are scenario names defined in the handler.
+ */
+const activeScenarios: Record<string, string> = {};
+
+export default activeScenarios;
+EOF
 
   # Remove generated .msw-lens/ directory (gitignored, but may be present locally).
   rm -rf "$app/.msw-lens"

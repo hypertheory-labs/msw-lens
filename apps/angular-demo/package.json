@@ -5,5 +5,8 @@
     "lens": "msw-lens",
     "lens:watch": "msw-lens --watch",
     "lens:context": "msw-lens --context"
+  },
+  "msw-lens": {
+    "templateExtension": ".html"
   }
 }

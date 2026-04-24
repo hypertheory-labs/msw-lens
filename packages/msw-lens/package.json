@@ -40,7 +40,8 @@
   },
   "scripts": {
     "build": "tsup",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@clack/prompts": "^0.9.1",
