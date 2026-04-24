@@ -34,19 +34,28 @@ const SCENARIO_ARCHETYPES = `
 - \`slow\` — MSW delay('real'); tests whether the submit button shows a pending/disabled state during submission
 `.trim();
 
+function fenceLang(filePath: string): string {
+  if (filePath.endsWith('.html')) return 'html';
+  if (filePath.endsWith('.jsx')) return 'jsx';
+  if (filePath.endsWith('.js')) return 'javascript';
+  return 'typescript';
+}
+
 function inlineFile(filePath: string, cwd: string): string {
   const rel = relative(cwd, filePath);
   const content = readFileSync(filePath, 'utf8');
-  const lang = filePath.endsWith('.html') ? 'html' : 'typescript';
-  return [`### ${basename(filePath)}`, `\`${rel}\``, `\`\`\`${lang}`, content.trim(), '```'].join(
+  return [`### ${basename(filePath)}`, `\`${rel}\``, `\`\`\`${fenceLang(filePath)}`, content.trim(), '```'].join(
     '\n'
   );
 }
 
+// Strip source-file extensions so `cart.component.ts`, `Cart.tsx`, `cart.ts`
+// all collapse to a framework-neutral identifier.
+const STRIPPABLE_EXTENSIONS = /\.(component\.ts|tsx?|jsx?)$/;
+
 function deriveComponentName(filePath: string): string {
   return basename(filePath)
-    .replace(/\.component\.ts$/, '')
-    .replace(/\.ts$/, '')
+    .replace(STRIPPABLE_EXTENSIONS, '')
     .split(/[-_]/)
     .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
     .join('');
@@ -90,7 +99,7 @@ export function generatePromptFile(
     '',
     'Based on the source files below, please:',
     '',
-    '1. Identify the HTTP endpoints this component reaches (through its store or service)',
+    '1. Identify the HTTP endpoints this component reaches — through its hooks, stores, services, or direct fetch/http calls',
     '2. For each endpoint, generate a `.yaml` manifest in msw-lens format',
     '3. For each endpoint, also generate a handler stub (`.ts`) with a switch statement',
     '   over the scenario names — match the pattern in the existing handler files',
@@ -104,8 +113,8 @@ export function generatePromptFile(
     'cart message appears and the checkout button disables."',
     '',
     'Use the format and vocabulary from the existing manifests below. If you notice',
-    'anything in the component or template that suggests a scenario I should consider',
-    'but haven\'t asked about — flag it.',
+    'anything in the component or its markup that suggests a scenario I should',
+    'consider but haven\'t asked about — flag it.',
     '',
     'If the provided files are incomplete — init methods with no visible call site,',
     'protected routes with no guard in scope, dependencies that seem to come from',
@@ -161,6 +170,6 @@ export function generatePromptFile(
     ''
   );
 
-  const promptFileName = basename(entryFile).replace(/\.component\.ts$/, '.md').replace(/\.ts$/, '.md');
+  const promptFileName = basename(entryFile).replace(STRIPPABLE_EXTENSIONS, '') + '.md';
   writeFileSync(join(promptsDir, promptFileName), lines.join('\n'), 'utf8');
 }

@@ -1,25 +1,36 @@
 import { existsSync, readFileSync } from 'fs';
 import { basename, dirname, join } from 'path';
 
+// Resolution order mirrors how bundlers resolve `./Foo` — try .ts first, then
+// .tsx, then .js, then .jsx. TypeScript sources preferred over plain JS.
+const SOURCE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx'];
+
 // Files we don't want to pull into LLM context — noise, not signal
 const SKIP_PATTERNS = [
-  /\.spec\.ts$/,   // test files — never useful
-  /\/index\.ts$/, // barrel files — just re-exports, no content
+  /\.(spec|test)\.(tsx?|jsx?)$/, // test files — never useful
+  /\/index\.(tsx?|jsx?)$/,        // barrel files — just re-exports, no content
 ];
 
 function shouldSkip(filePath: string): boolean {
   return SKIP_PATTERNS.some((p) => p.test(filePath));
 }
 
+function isSourceFile(filePath: string): boolean {
+  return SOURCE_EXTENSIONS.some((ext) => filePath.endsWith(ext));
+}
+
 function resolveImport(importPath: string, fromFile: string): string | null {
   const dir = dirname(fromFile);
-  const candidates = [
-    join(dir, importPath + '.ts'),
-    join(dir, importPath, 'index.ts'),
-    join(dir, importPath),
-  ];
+  const candidates: string[] = [];
+  for (const ext of SOURCE_EXTENSIONS) {
+    candidates.push(join(dir, importPath + ext));
+  }
+  for (const ext of SOURCE_EXTENSIONS) {
+    candidates.push(join(dir, importPath, 'index' + ext));
+  }
+  candidates.push(join(dir, importPath));
   for (const c of candidates) {
-    if (existsSync(c) && c.endsWith('.ts')) return c;
+    if (existsSync(c) && isSourceFile(c)) return c;
   }
   return null;
 }
@@ -41,7 +52,7 @@ function getRelativeImports(filePath: string): string[] {
  * Only follows relative imports — node_modules are excluded automatically.
  * Skips spec files and barrel index files.
  */
-export function discoverRelatedFiles(entryTs: string, templateExtension: string | null = '.html'): string[] {
+export function discoverRelatedFiles(entryTs: string, templateExtension: string | null = null): string[] {
   const collected: string[] = [];
   const seen = new Set<string>();
 

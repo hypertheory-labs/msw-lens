@@ -1,6 +1,6 @@
 # msw-lens context
-generated: 2026-04-06T21:24:42.734Z
-entry: src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/cart.ts
+generated: 2026-04-24T17:05:36.133Z
+entry: apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/cart.ts
 
 ---
 
@@ -11,7 +11,7 @@ create MSW mock scenarios for the endpoints it depends on.
 
 Based on the source files below, please:
 
-1. Identify the HTTP endpoints this component reaches (through its store or service)
+1. Identify the HTTP endpoints this component reaches — through its hooks, stores, services, or direct fetch/http calls
 2. For each endpoint, generate a `.yaml` manifest in msw-lens format
 3. For each endpoint, also generate a handler stub (`.ts`) with a switch statement
    over the scenario names — match the pattern in the existing handler files
@@ -25,8 +25,8 @@ looks like. Not: "Returns an empty items array." Instead: "Tests that the empty
 cart message appears and the checkout button disables."
 
 Use the format and vocabulary from the existing manifests below. If you notice
-anything in the component or template that suggests a scenario I should consider
-but haven't asked about — flag it.
+anything in the component or its markup that suggests a scenario I should
+consider but haven't asked about — flag it.
 
 If the provided files are incomplete — init methods with no visible call site,
 protected routes with no guard in scope, dependencies that seem to come from
@@ -38,7 +38,7 @@ silently filling the gaps.
 ## Source files
 
 ### cart.ts
-`src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/cart.ts`
+`apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/cart.ts`
 ```typescript
 import { Component, inject } from '@angular/core';
 import { PageLayout } from '@ht/shared/ui-common/layouts/page';
@@ -83,7 +83,7 @@ export class CartPage {
 ```
 
 ### cart-store.ts
-`src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts`
+`apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts`
 ```typescript
 import { computed } from '@angular/core';
 import { patchState, signalStore, withComputed, withHooks, withMethods } from '@ngrx/signals';
@@ -166,19 +166,23 @@ export const cartStore = signalStore(
 ## Handler registration
 
 ### handlers.ts
-`src/app/__mocks__/handlers.ts`
+`apps/angular-demo/src/app/__mocks__/handlers.ts`
 ```typescript
 import { HttpHandler } from 'msw';
 import authHandler from './auth/user';
 import cartHandler from './cart/cart';
 import cartPatchHandler from './cart/cart-patch';
 import cartDeleteHandler from './cart/cart-delete';
+import productsGetHandler from './products/products-get';
+import productsPostHandler from './products/products-post';
 
 export const handlers: HttpHandler[] = [
   ...authHandler,
   ...cartHandler,
   ...cartPatchHandler,
   ...cartDeleteHandler,
+  ...productsGetHandler,
+  ...productsPostHandler,
 ];
 ```
 
@@ -186,8 +190,228 @@ export const handlers: HttpHandler[] = [
 
 ## Existing manifests + handlers (pattern reference)
 
+### products-post.yaml
+`apps/angular-demo/src/app/__mocks__/products/products-post.yaml`
+```yaml
+# MSW Scenario Manifest
+# This file is the source of truth for what scenarios exist for this endpoint.
+# It is read by msw-lens to populate the scenario switcher.
+# It can also be dropped into an LLM conversation as context.
+
+endpoint: https://store.company.com/products
+method: POST
+description: Create a new product — expects name, description, price, cost; returns the created item with a server-assigned id
+
+responseType:
+  name: ProductApiItem
+  path: apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/data/product-store.ts
+
+errorType:
+  name: ProblemDetails
+  path: apps/angular-demo/src/app/areas/shared/util-types/problem-details.ts
+
+context:
+  sourceHints:
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/data/product-store.ts
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/add-product.ts
+  hints:
+    - 'Client-side validates: name required, description required, price > cost. Server-side
+      validation may enforce additional constraints (negative values, zero price, max length)
+      that the form does not.'
+    - 'createProduct() does not catch fetch errors. On any non-2xx response, the store still
+      calls patchState(addEntity(...)) with whatever res.json() returns — likely an error body
+      masquerading as a ProductApiItem. The form also resets unconditionally after await, so
+      a 500 response will silently clear the form as if the product was created.'
+    - 'The submit button has no pending or disabled state — rapid double-submission is possible.'
+
+scenarios:
+  created:
+    description: Product created successfully — form resets, product count increments by one
+    active: true
+    httpStatus: 201
+
+  validation-error:
+    description: Server rejects the submission — tests whether ProblemDetails errors surface in the UI (currently no server-error handling in the template; form will silently reset)
+    httpStatus: 422
+
+  conflict:
+    description: A product with this name already exists — tests whether the UI surfaces the 409 conflict message or silently clears the form
+    httpStatus: 409
+
+  unauthorized:
+    description: Session expired mid-form — tests whether an auth guard intercepts or the form fails silently
+    httpStatus: 401
+
+  forbidden:
+    description: User lacks permission to create products — tests whether a 403 is surfaced or silently swallowed (no role-gating visible in the template)
+    httpStatus: 403
+
+  server-error:
+    description: Product service unavailable — currently createProduct() will reset the form anyway, making it appear the product was created; tests whether this silent failure is acceptable
+    httpStatus: 500
+
+  slow:
+    description: Sluggish product service — tests whether the Create Product button shows a pending/disabled state during submission (currently it does not)
+    delay: real
+```
+
+### products-post.ts
+`apps/angular-demo/src/app/__mocks__/products/products-post.ts`
+```typescript
+import { http, HttpHandler, delay, HttpResponse } from 'msw';
+import activeScenarios from '../active-scenarios';
+import { ProductApiItem, ProductCreateModel } from '../../areas/shopping-cart/shopping-cart-landing/data/product-store';
+
+const ENDPOINT = 'https://store.company.com/products';
+const SCENARIO_KEY = `POST ${ENDPOINT}`;
+
+export default [
+  http.post(ENDPOINT, async ({ request }) => {
+    const scenario = activeScenarios[SCENARIO_KEY] ?? 'created';
+    const body = await request.json() as ProductCreateModel;
+
+    switch (scenario) {
+      case 'validation-error':
+        return HttpResponse.json(
+          {
+            type: 'https://store.company.com/errors/validation-failed',
+            title: 'Validation failed',
+            status: 422,
+            detail: 'One or more fields are invalid.',
+            errors: { price: ['Price must be greater than cost.'] },
+          },
+          { status: 422 },
+        );
+
+      case 'conflict':
+        return HttpResponse.json(
+          {
+            type: 'https://store.company.com/errors/product-exists',
+            title: 'Product already exists',
+            status: 409,
+            detail: `A product named "${body.name}" already exists.`,
+          },
+          { status: 409 },
+        );
+
+      case 'unauthorized':
+        return new HttpResponse(null, { status: 401 });
+
+      case 'forbidden':
+        return new HttpResponse(null, { status: 403 });
+
+      case 'server-error':
+        return new HttpResponse(null, { status: 500 });
+
+      case 'slow':
+        await delay('real');
+        return HttpResponse.json(
+          { ...body, id: crypto.randomUUID() } as ProductApiItem,
+          { status: 201 },
+        );
+
+      case 'created':
+      default:
+        return HttpResponse.json(
+          { ...body, id: crypto.randomUUID() } as ProductApiItem,
+          { status: 201 },
+        );
+    }
+  }),
+] as HttpHandler[];
+```
+
+### products-get.yaml
+`apps/angular-demo/src/app/__mocks__/products/products-get.yaml`
+```yaml
+# MSW Scenario Manifest
+# This file is the source of truth for what scenarios exist for this endpoint.
+# It is read by msw-lens to populate the scenario switcher.
+# It can also be dropped into an LLM conversation as context.
+
+endpoint: https://store.company.com/products
+method: GET
+shape: collection
+description: Full product catalogue — name, description, price, cost per item
+
+responseType:
+  name: ProductApiItem[]
+  path: apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/data/product-store.ts
+
+context:
+  sourceHints:
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/data/product-store.ts
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/add-product.ts
+  hints:
+    - "_load() has no visible call site in the AddProduct component — it is likely called
+      from a route resolver or parent. The component renders store.entities().length, so
+      the list must be populated before the component mounts."
+
+scenarios:
+  typical:
+    description: Several products loaded — the happy path; verifies product count renders correctly and the form is ready for input
+    active: true
+
+  empty:
+    description: No products yet — tests whether the count shows zero and the form is still usable (currently the template shows 0 without any empty-state messaging)
+
+  slow:
+    description: Sluggish catalogue service — tests whether any loading state appears during fetch (currently none visible in the template)
+    delay: real
+
+  unauthorized:
+    description: Session expired before the page loaded — tests whether an auth guard intercepts and redirects to login
+    httpStatus: 401
+
+  server-error:
+    description: Catalogue service unavailable — tests whether an error boundary or fallback UI appears (currently _load() swallows fetch errors silently)
+    httpStatus: 500
+```
+
+### products-get.ts
+`apps/angular-demo/src/app/__mocks__/products/products-get.ts`
+```typescript
+import { http, HttpHandler, delay, HttpResponse } from 'msw';
+import activeScenarios from '../active-scenarios';
+import { ProductApiItem } from '../../areas/shopping-cart/shopping-cart-landing/data/product-store';
+
+const ENDPOINT = 'https://store.company.com/products';
+const SCENARIO_KEY = `GET ${ENDPOINT}`;
+
+const typicalProducts: ProductApiItem[] = [
+  { id: crypto.randomUUID(), name: 'Mechanical Keyboard', description: 'Tactile switches, RGB backlight', price: 129.99, cost: 65.00 },
+  { id: crypto.randomUUID(), name: 'USB-C Hub', description: '7-port hub with 100W PD charging', price: 49.99, cost: 22.00 },
+  { id: crypto.randomUUID(), name: 'Monitor Stand', description: 'Adjustable height, cable management tray', price: 34.95, cost: 18.00 },
+];
+
+export default [
+  http.get(ENDPOINT, async () => {
+    const scenario = activeScenarios[SCENARIO_KEY] ?? 'typical';
+
+    switch (scenario) {
+      case 'empty':
+        return HttpResponse.json([]);
+
+      case 'slow':
+        await delay('real');
+        return HttpResponse.json(typicalProducts);
+
+      case 'unauthorized':
+        return new HttpResponse(null, { status: 401 });
+
+      case 'server-error':
+        return new HttpResponse(null, { status: 500 });
+
+      case 'typical':
+      default:
+        return HttpResponse.json(typicalProducts);
+    }
+  }),
+] as HttpHandler[];
+```
+
 ### cart.yaml
-`src/app/__mocks__/cart/cart.yaml`
+`apps/angular-demo/src/app/__mocks__/cart/cart.yaml`
 ```yaml
 # MSW Scenario Manifest
 # This file is the source of truth for what scenarios exist for this endpoint.
@@ -201,12 +425,12 @@ description: Current user's shopping cart items
 
 responseType:
   name: CartApiItem[]
-  path: src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts
+  path: apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts
 
 context:
   sourceHints:
-    - src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts
-    - src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/cart.ts
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/cart.ts
 
 scenarios:
   typical:
@@ -242,7 +466,7 @@ scenarios:
 ```
 
 ### cart.ts
-`src/app/__mocks__/cart/cart.ts`
+`apps/angular-demo/src/app/__mocks__/cart/cart.ts`
 ```typescript
 import { http, HttpHandler, delay, HttpResponse } from 'msw';
 import activeScenarios from '../active-scenarios';
@@ -310,7 +534,7 @@ export default [
 ```
 
 ### cart-patch.yaml
-`src/app/__mocks__/cart/cart-patch.yaml`
+`apps/angular-demo/src/app/__mocks__/cart/cart-patch.yaml`
 ```yaml
 # MSW Scenario Manifest
 # This file is the source of truth for what scenarios exist for this endpoint.
@@ -323,12 +547,12 @@ description: Update the quantity of a cart item
 
 errorType:
   name: ProblemDetails
-  path: src/app/areas/shared/util-types/problem-details.ts
+  path: apps/angular-demo/src/app/areas/shared/util-types/problem-details.ts
 
 context:
   sourceHints:
-    - src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts
-    - src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/cart.ts
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/cart.ts
 
 scenarios:
   success:
@@ -349,7 +573,7 @@ scenarios:
 ```
 
 ### cart-patch.ts
-`src/app/__mocks__/cart/cart-patch.ts`
+`apps/angular-demo/src/app/__mocks__/cart/cart-patch.ts`
 ```typescript
 import { http, HttpHandler, delay, HttpResponse } from 'msw';
 import activeScenarios from '../active-scenarios';
@@ -390,7 +614,7 @@ export default [
 ```
 
 ### cart-delete.yaml
-`src/app/__mocks__/cart/cart-delete.yaml`
+`apps/angular-demo/src/app/__mocks__/cart/cart-delete.yaml`
 ```yaml
 # MSW Scenario Manifest
 # This file is the source of truth for what scenarios exist for this endpoint.
@@ -403,12 +627,12 @@ description: Remove an item from the current user's cart
 
 errorType:
   name: ProblemDetails
-  path: src/app/areas/shared/util-types/problem-details.ts
+  path: apps/angular-demo/src/app/areas/shared/util-types/problem-details.ts
 
 context:
   sourceHints:
-    - src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts
-    - src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/cart.ts
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/data/cart-store.ts
+    - apps/angular-demo/src/app/areas/shopping-cart/shopping-cart-landing/internal/pages/cart.ts
 
 scenarios:
   success:
@@ -425,7 +649,7 @@ scenarios:
 ```
 
 ### cart-delete.ts
-`src/app/__mocks__/cart/cart-delete.ts`
+`apps/angular-demo/src/app/__mocks__/cart/cart-delete.ts`
 ```typescript
 import { http, HttpHandler, delay, HttpResponse } from 'msw';
 import activeScenarios from '../active-scenarios';
@@ -454,7 +678,7 @@ export default [
 ```
 
 ### user.yaml
-`src/app/__mocks__/auth/user.yaml`
+`apps/angular-demo/src/app/__mocks__/auth/user.yaml`
 ```yaml
 # MSW Scenario Manifest
 # This file is the source of truth for what scenarios exist for this endpoint.
@@ -468,15 +692,15 @@ description: Currently authenticated user profile
 
 responseType:
   name: AuthUser
-  path: src/app/areas/shared/util-auth/internal/types.ts
+  path: apps/angular-demo/src/app/areas/shared/util-auth/internal/types.ts
 
 # sourceHints: paths to files that consume or depend on this endpoint.
 # An LLM will read these to understand what scenarios are worth testing.
 # You provide the pointers — the LLM derives the meaning.
 context:
   sourceHints:
-    - src/app/areas/shared/util-auth/store.ts
-    - src/app/areas/shared/util-auth/internal/types.ts
+    - apps/angular-demo/src/app/areas/shared/util-auth/store.ts
+    - apps/angular-demo/src/app/areas/shared/util-auth/internal/types.ts
 
 scenarios:
   logged-in:
@@ -500,7 +724,7 @@ scenarios:
 ```
 
 ### user.ts
-`src/app/__mocks__/auth/user.ts`
+`apps/angular-demo/src/app/__mocks__/auth/user.ts`
 ```typescript
 import { http, HttpHandler, delay, HttpResponse } from 'msw';
 import activeScenarios from '../active-scenarios';
@@ -547,9 +771,9 @@ export default [
 
 ## About msw-lens
 
-msw-lens manages MSW scenario switching for Angular development. Manifests live
+msw-lens manages MSW scenario switching for web development. Manifests live
 alongside handlers in `__mocks__` directories. The active scenario is written to
-`src/app/__mocks__/active-scenarios.ts` — Vite HMR picks it up immediately.
+`apps/angular-demo/src/app/__mocks__/active-scenarios.ts` — Vite HMR picks it up immediately.
 
 `active-scenarios.ts` is tool-owned. Do not include instructions to edit it manually.
 

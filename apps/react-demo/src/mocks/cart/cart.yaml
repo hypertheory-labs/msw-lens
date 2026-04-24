@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://unpkg.com/@hypertheory-labs/msw-lens/schema/manifest.schema.json
+
+endpoint: /api/cart
+method: GET
+shape: collection
+description: User's shopping cart — items plus computed total
+
+responseType:
+  name: Cart
+  path: apps/react-demo/src/types.ts
+
+context:
+  sourceHints:
+    - apps/react-demo/src/features/cart/useCart.ts
+
+scenarios:
+  typical:
+    description: Cart has multiple items — renders the item list, line totals, and enables checkout
+    active: true
+
+  empty:
+    description: Zero items — tests that the empty-cart message appears and the Checkout button disables
+
+  slow:
+    description: Sluggish backend — tests that the loading state renders before the cart appears
+    delay: real
+
+  unauthorized:
+    description: Session expired — tests that the UI surfaces an authentication error rather than silently rendering an empty cart
+    httpStatus: 401
+
+  server-error:
+    description: Backend unreachable — tests that the error alert appears with a recoverable message
+    httpStatus: 500

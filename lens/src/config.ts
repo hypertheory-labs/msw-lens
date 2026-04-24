@@ -3,12 +3,14 @@ import { join } from 'path';
 
 export interface LensConfig {
   mocksDir: string;
-  templateExtension: string | null; // e.g. '.html' for Angular, null for React (inline JSX)
+  // Sibling template file extension, for frameworks that separate template from
+  // logic. Angular: '.html'. React/Vue-with-inline-templates/Svelte: leave null.
+  templateExtension: string | null;
 }
 
 const DEFAULTS: LensConfig = {
-  mocksDir: 'src/__mocks__',
-  templateExtension: '.html',
+  mocksDir: 'src/mocks',
+  templateExtension: null,
 };
 
 export function readConfig(cwd: string): LensConfig {

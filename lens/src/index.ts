@@ -33,7 +33,7 @@ function defaultScenario(manifest: Manifest): string {
 }
 
 async function main() {
-  const manifests = await discoverManifests(cwd);
+  const manifests = await discoverManifests(cwd, config);
   const state = readActiveScenarios(cwd, config);
 
   // Context generation mode — emit files, no interactive prompt
@@ -54,7 +54,10 @@ async function main() {
 
   if (manifests.length === 0) {
     note(
-      'No manifests found. Create a .yaml file alongside a handler in a __mocks__ directory.',
+      `No manifests found in ${config.mocksDir}/.\n\n` +
+        `Expected layout: ${config.mocksDir}/<endpoint>/<handler>.yaml\n\n` +
+        `If your mocks live elsewhere, set "msw-lens.mocksDir" in package.json:\n` +
+        `  "msw-lens": { "mocksDir": "path/to/your/mocks" }`,
       'nothing to switch'
     );
     outro('');

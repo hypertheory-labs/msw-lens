@@ -1,6 +1,7 @@
 import { glob } from 'glob';
 import yaml from 'js-yaml';
 import { readFileSync } from 'fs';
+import type { LensConfig } from './config.js';
 
 export interface Scenario {
   description: string;
@@ -20,8 +21,8 @@ export interface Manifest {
   _filePath: string;
 }
 
-export async function discoverManifests(cwd: string): Promise<Manifest[]> {
-  const files = await glob('**/__mocks__/**/*.yaml', {
+export async function discoverManifests(cwd: string, config: LensConfig): Promise<Manifest[]> {
+  const files = await glob(`${config.mocksDir}/**/*.yaml`, {
     cwd,
     ignore: ['node_modules/**'],
     absolute: true,

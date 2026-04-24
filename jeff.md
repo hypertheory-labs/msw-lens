@@ -1,2 +1,14 @@
 - Stuff for Next Session
-  - I think I want to redo the Angular demo app. I used my starter app, and there is too much noise. 
+    - I feel like this repo got a bit crazy - it started off with me using my classroom starter app (https://github.com/HypertheoryTraining/angular-starter-2026)
+    - we now have the "core" which is the `./lens/` project - this is the "Deliverable" - I still need to publish it to NPM but my goal is to do that today.
+    - what I feel like needs to happen before that - but really want your feedback:
+        - remove everything in this repo's root that is left over from the use of the angular-starter-2026
+        - in the `./apps/` - replace the Angular application with a fresh Angular 21.2 demo with the same basic functionality - (the current version uses too elaborate a setup, Sheriff, areas, etc - this just needs to be way more straight forward)
+        - Once we are done with that Angular version, I'd like to do the final pieces to make sure that the msw-lens library is really independent of Angular
+        - Create a version of the Angular demo app in
+            - Vue 3.x
+            - React (whatever that is at now)
+    - Write good starter docs and an overview (there is some in ./docs/) - these will actually be put into an existing Astro Starlight project with the basic Astro frontmatter, so we'll add that here, too.
+- It looks like we started moving to NX and then bailed - is that what you are seeing here?
+    - I think NX would be the best way to do all of this, but willing to discuss with you.
+

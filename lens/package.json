@@ -2,15 +2,42 @@
   "name": "@hypertheory-labs/msw-lens",
   "version": "0.1.0",
   "description": "Scenario switcher and context generator for MSW Mock Service Worker",
+  "keywords": [
+    "msw",
+    "mock-service-worker",
+    "mocking",
+    "api-mocking",
+    "scenarios",
+    "testing",
+    "developer-tools",
+    "llm",
+    "ai",
+    "angular",
+    "react",
+    "vue"
+  ],
+  "license": "MIT",
+  "author": "Jeffry Gonzalez <jeff@hypertheory.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hypertheory-labs/msw-lens.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hypertheory-labs/msw-lens/issues"
+  },
+  "homepage": "https://github.com/hypertheory-labs/msw-lens#readme",
   "type": "module",
   "bin": {
-    "msw-lens": "./dist/index.js"
+    "msw-lens": "dist/index.js"
   },
   "main": "./dist/index.js",
   "files": [
     "dist",
     "schema"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsx src/index.ts"
