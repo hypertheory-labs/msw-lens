@@ -2,7 +2,7 @@
 
 ## What It Is
 
-`lens/schema/manifest.schema.json` is a JSON Schema (draft-07) for the YAML manifest files.
+`packages/msw-lens/schema/manifest.schema.json` is a JSON Schema (draft-07) for the YAML manifest files.
 It's picked up by the Red Hat YAML extension in VS Code and provides autocomplete, hover
 documentation, and soft validation for any manifest file.
 
@@ -27,7 +27,7 @@ When `lens:context` scaffolds a new manifest, it should include this line automa
 ```json
 {
   "yaml.schemas": {
-    "./lens/schema/manifest.schema.json": "**/__mocks__/**/*.yaml"
+    "./packages/msw-lens/schema/manifest.schema.json": "**/__mocks__/**/*.yaml"
   }
 }
 ```
@@ -116,7 +116,7 @@ with that.
 
 ## Package Distribution
 
-Add `schema/` to the `files` array in `lens/package.json` so it's included in the
+Add `schema/` to the `files` array in `packages/msw-lens/package.json` so it's included in the
 published package:
 
 ```json

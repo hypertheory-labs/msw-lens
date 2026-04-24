@@ -1,0 +1,32 @@
+<div class="card bg-base-100 shadow">
+  <div class="card-body">
+    @let state = cart.state();
+
+    @if (state.status === 'idle' || state.status === 'loading') {
+      <p class="text-base-content/70" aria-busy="true">Loading cart…</p>
+    } @else if (state.status === 'error') {
+      <div role="alert" class="alert alert-error">
+        Could not load your cart. {{ state.message }}
+      </div>
+    } @else if (state.cart.items.length === 0) {
+      <h2 class="card-title">Your cart is empty</h2>
+      <div class="card-actions">
+        <button class="btn btn-primary" disabled>Checkout</button>
+      </div>
+    } @else {
+      <h2 class="card-title">Cart</h2>
+      <ul class="divide-y divide-base-300">
+        @for (item of state.cart.items; track item.id) {
+          <li class="py-2 flex justify-between">
+            <span>{{ item.name }} × {{ item.quantity }}</span>
+            <span>{{ item.price * item.quantity | currency }}</span>
+          </li>
+        }
+      </ul>
+      <p class="font-bold mt-2">Total: {{ state.cart.total | currency }}</p>
+      <div class="card-actions">
+        <button class="btn btn-primary">Checkout</button>
+      </div>
+    }
+  </div>
+</div>

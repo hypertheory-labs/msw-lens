@@ -22,7 +22,7 @@
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "yaml.schemas": {
-    "./lens/schema/manifest.schema.json": "**/__mocks__/**/*.yaml"
+    "./packages/msw-lens/schema/manifest.schema.json": "**/__mocks__/**/*.yaml"
   },
   "cSpell.words": [
     "daisyui",

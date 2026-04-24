@@ -1,8 +1,14 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
 # msw-lens
-lens/node_modules
-lens/dist
+packages/msw-lens/node_modules
+packages/msw-lens/dist
+
+# Demo app runtime artifacts — committed in user projects, noise in this repo
+apps/*/.msw-lens/
+
+# Jeff's scratch notes to future Claude instances
+jeff.md
 
 # Compiled output
 /dist

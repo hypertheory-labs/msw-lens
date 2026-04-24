@@ -1,0 +1,16 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "msw-lens",
+  "projectType": "library",
+  "sourceRoot": "packages/msw-lens/src",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "packages/msw-lens"
+      },
+      "outputs": ["{workspaceRoot}/packages/msw-lens/dist"]
+    }
+  }
+}

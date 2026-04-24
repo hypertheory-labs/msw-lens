@@ -1,0 +1,9 @@
+{
+  "name": "angular-demo",
+  "private": true,
+  "scripts": {
+    "lens": "msw-lens",
+    "lens:watch": "msw-lens --watch",
+    "lens:context": "msw-lens --context"
+  }
+}
