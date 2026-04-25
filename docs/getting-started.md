@@ -7,6 +7,12 @@ This page assumes you already have MSW working in your project — a `browser.ts
 
 If you don't have MSW set up yet, start with the [MSW docs](https://mswjs.io/docs/getting-started).
 
+**Recommended MSW config:** start the worker with `onUnhandledRequest: 'bypass'` — it makes the msw-lens bypass feature work without warnings, and it's idiomatic for dev anyway:
+
+```typescript
+worker.start({ onUnhandledRequest: 'bypass' });
+```
+
 ## Install
 
 ```bash
@@ -18,6 +24,7 @@ Add the scripts to your `package.json`:
 ```json
 {
   "scripts": {
+    "lens:init": "msw-lens --init",
     "lens": "msw-lens",
     "lens:watch": "msw-lens --watch",
     "lens:context": "msw-lens --context"
@@ -25,7 +32,15 @@ Add the scripts to your `package.json`:
 }
 ```
 
-That's it. If your MSW handlers live in `src/mocks/` (MSW's recommended layout) there's no configuration to write.
+Then run `lens:init` once to bootstrap msw-lens's tool-owned files:
+
+```bash
+npm run lens:init
+```
+
+This creates `active-scenarios.ts` and `bypassed-endpoints.ts` (both empty), generates an initial `.msw-lens/context.md`, and prints a setup checklist. Idempotent — safe to re-run.
+
+If your MSW handlers live in `src/mocks/` (MSW's recommended layout) there's no further configuration to write.
 
 If your mocks live somewhere else — `src/app/__mocks__/`, `apps/web/src/mocks/`, etc. — add a `msw-lens` block to `package.json`:
 
@@ -96,7 +111,7 @@ The key is `"GET /api/cart"`, not `"/api/cart"`. If you have multiple methods on
 npm run lens
 ```
 
-You'll see a terminal UI listing your endpoints. Select one, pick a scenario, exit. msw-lens writes `src/mocks/active-scenarios.ts` — a single file your handlers import. If your app is running, Vite HMR picks up the change and the UI updates without a reload.
+You'll see a terminal UI listing your endpoints. Select one, pick a scenario (or `bypass — pass through to real API` to let the request reach the real network), exit. msw-lens writes the change to `src/mocks/active-scenarios.ts` (or `bypassed-endpoints.ts` for bypass). If your app is running, Vite HMR picks up the change and the UI updates without a reload.
 
 Run `npm run lens:watch` to stay in the switcher between changes. Ctrl+C when done.
 
@@ -109,6 +124,7 @@ src/mocks/
   browser.ts
   handlers.ts
   active-scenarios.ts     ← created by msw-lens; tool-owned
+  bypassed-endpoints.ts   ← created by msw-lens; tool-owned
   cart/
     cart.ts
     cart.yaml

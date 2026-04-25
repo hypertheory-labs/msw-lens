@@ -12,8 +12,9 @@ Every time you start a new AI conversation, it begins cold. No memory of what yo
 
 msw-lens produces committed artifacts that any AI instance can read and immediately reason about:
 
-- **`active-scenarios.ts`** — what conditions the app is running under right now
-- **`.msw-lens/context.md`** — current snapshot of every mocked endpoint and active scenario
+- **`active-scenarios.ts`** — which scenario is active per endpoint
+- **`bypassed-endpoints.ts`** — endpoints currently bypassing MSW (real-network passthrough)
+- **`.msw-lens/context.md`** — current snapshot of every mocked endpoint, active scenario, and bypass status
 - **`.msw-lens/prompts/<component>.md`** — ready-to-paste prompt for getting scenario suggestions
 
 Drop `context.md` into any conversation. That instance knows what's mocked, what scenarios exist, what's active, and where the source files are. No narration required.
@@ -35,6 +36,7 @@ Add to your `package.json`:
 ```json
 {
   "scripts": {
+    "lens:init": "msw-lens --init",
     "lens": "msw-lens",
     "lens:watch": "msw-lens --watch",
     "lens:context": "msw-lens --context"
@@ -44,15 +46,30 @@ Add to your `package.json`:
 
 The `msw-lens` config block is optional. If your MSW handlers live in `src/mocks/` (MSW's recommended layout) it's zero-config. See [Configuration](#framework-configuration) if you need to point at a different directory.
 
+Run `npm run lens:init` once after install to bootstrap msw-lens's tool-owned files. It creates `active-scenarios.ts` and `bypassed-endpoints.ts` (both empty), regenerates `.msw-lens/context.md`, and prints a setup checklist. Idempotent — re-running it leaves existing files alone.
+
+### MSW prerequisite for bypass
+
+For the bypass feature to pass through to real APIs (rather than warn or error), start MSW with `onUnhandledRequest: 'bypass'`:
+
+```typescript
+worker.start({ onUnhandledRequest: 'bypass' });
+```
+
+This is conventional MSW configuration anyway — mock what you intend to mock, real-network everything else.
+
 ---
 
 ## Commands
 
 ```bash
+npm run lens:init                                     # bootstrap tool-owned files (run once)
 npm run lens                                          # scenario switcher
 npm run lens:watch                                    # switcher, Ctrl+C to exit
 npm run lens:context -- <path/to/component.ts>        # generate .msw-lens/prompts/<component>.md
 ```
+
+The switcher's scenario picker offers `bypass — pass through to real API` per endpoint alongside the manifest's declared scenarios. Picking bypass filters the handler out of MSW registration entirely; requests reach the real network. Pick any other scenario to restore mocking.
 
 ---
 
@@ -60,16 +77,16 @@ npm run lens:context -- <path/to/component.ts>        # generate .msw-lens/promp
 
 This monorepo contains demo apps showing msw-lens working across frameworks — same YAML manifests, same mock layer, different UI.
 
-| App | Framework | Path |
-|-----|-----------|------|
-| angular-demo | Angular 21 + NgRx Signals | `apps/angular-demo/` |
-| react-demo | React + Vite | `apps/react-demo/` *(coming soon)* |
-| vue-demo | Vue 3 + Vite | `apps/vue-demo/` *(coming soon)* |
+| App | Framework | Status |
+|-----|-----------|--------|
+| `apps/angular-demo/` | Angular 21 + Tailwind + DaisyUI | working |
+| `apps/react-demo/` | Vite + React 19 + Tailwind + DaisyUI | working |
+| `apps/vue-demo/` | Vue 3 + Vite | planned |
 
 ```bash
-nx serve angular-demo     # start Angular demo
-nx build angular-demo     # build Angular demo
-nx build msw-lens         # build the tool
+nx serve angular-demo     # dev server
+nx build angular-demo     # production build
+npm run build:lens        # build the package itself
 ```
 
 ---
@@ -207,18 +224,24 @@ export default [
 
 Key: `"GET /api/user/"` not `"/api/user/"`. Multiple methods on the same endpoint (PATCH and DELETE on `/cart/:id`) need the method prefix to avoid collisions.
 
-Register in `handlers.ts`:
+Register in `handlers.ts` with the bypass filter:
 
 ```typescript
 import { HttpHandler } from 'msw';
 import authHandler from './auth/user';
 import cartHandler from './cart/cart';
+import bypassed from './bypassed-endpoints';
 
-export const handlers: HttpHandler[] = [
-  ...authHandler,
-  ...cartHandler,
-];
+const all: HttpHandler[] = [...authHandler, ...cartHandler];
+
+export const handlers: HttpHandler[] = all.filter((h) => {
+  const { method, path } = h.info;
+  if (typeof method !== 'string' || typeof path !== 'string') return true;
+  return !bypassed.has(`${method} ${path}`);
+});
 ```
+
+`bypassed-endpoints.ts` is tool-owned (msw-lens writes it). The filter removes bypassed endpoints from MSW registration entirely so matching requests pass through to the real network — see the [MSW prerequisite](#msw-prerequisite-for-bypass) above.
 
 ### Mutation handlers
 

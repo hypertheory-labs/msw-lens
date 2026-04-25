@@ -17,8 +17,9 @@ Every time you start a new AI conversation about your app, it begins cold. No me
 
 msw-lens works by producing **committed artifacts** that any AI instance can read and reason about immediately:
 
-- `src/mocks/active-scenarios.ts` — what conditions your app is running under right now
-- `.msw-lens/context.md` — a snapshot of every mocked endpoint, what scenarios exist, what's active
+- `src/mocks/active-scenarios.ts` — which scenario is active per endpoint
+- `src/mocks/bypassed-endpoints.ts` — endpoints currently bypassing MSW (real-network passthrough)
+- `.msw-lens/context.md` — a snapshot of every mocked endpoint, active scenarios, and bypass status
 - `.msw-lens/prompts/<component>.md` — a ready-to-paste prompt assembled from real source files
 
 Drop `context.md` into any conversation. That instance knows what's mocked, what scenarios exist, what's active, and where the source files are. No narration required.

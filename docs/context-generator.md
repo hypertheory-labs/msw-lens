@@ -13,17 +13,17 @@ Point it at a component (`.ts`, `.tsx`, `.js`, `.jsx`). It crawls the component'
 
 ## What the prompt contains
 
-Every generated prompt has four sections in a fixed order:
+Every generated prompt has five sections in a fixed order:
 
-1. **The ask.** A pre-written request asking the AI to identify endpoints, generate manifests, generate handler stubs, and flag scenarios you didn't ask about. The phrasing is deliberate — it asks for UI-behavior descriptions rather than data-shape descriptions, and demands explicit assumptions rather than silent gap-filling.
+1. **The ask.** A pre-written request asking the AI to identify endpoints, generate manifests, generate handler stubs, and flag scenarios you didn't ask about. The phrasing is deliberate — it asks for UI-behavior descriptions rather than data-shape descriptions, demands explicit assumptions rather than silent gap-filling, and tells the AI to skip generation for endpoints that already have a manifest.
 
 2. **Source files.** The actual contents of every TypeScript/JSX file reachable from the entry component's imports (and their imports, recursively). For Angular, any sibling `.html` template file if `templateExtension` is configured.
 
-3. **Handler registration.** Your `handlers.ts` aggregator, so the AI knows the pattern for registering new handlers.
+3. **Handler registration.** Your `handlers.ts` aggregator, so the AI knows the pattern for registering new handlers (including the bypass filter).
 
-4. **Existing manifests + handlers.** All the manifests msw-lens found in your project, plus their sibling `.ts` handler files. These act as pattern reference — the AI copies your conventions rather than inventing new ones.
+4. **Existing manifests + handlers** *(only present if you have any).* All the manifests msw-lens found in your project, plus their sibling `.ts` handler files. These act as pattern reference — the AI copies your conventions rather than inventing new ones.
 
-5. **About msw-lens.** A short blurb explaining what the tool is and what scenario archetypes are conventional.
+5. **About msw-lens.** The canonical Manifest pattern and Handler pattern (each with non-negotiables), plus scenario-archetype vocabulary. This section is what lets the cold-start case work — when no existing manifests exist, the AI still has a complete, prescriptive reference to follow.
 
 The output is typically 15–40 KB. Paste the whole thing.
 

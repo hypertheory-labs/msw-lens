@@ -159,7 +159,7 @@ scenarios:
 - **`description`** (required) — what UI behavior this scenario tests. See [the one rule](#the-one-rule-for-scenario-descriptions).
 - **`active`** — exactly one scenario should have `active: true`. Used as fallback when `active-scenarios.ts` has no entry yet.
 - **`httpStatus`** — the HTTP status code. Used for error scenarios. When absent, handlers typically return 200.
-- **`delay`** — an [MSW delay mode](https://mswjs.io/docs/api/delay/). Common values: `real` (realistic network latency), or a number in milliseconds.
+- **`delay`** — an [MSW delay mode](https://mswjs.io/docs/api/delay/). One of: `real` (realistic network latency), `infinite` (request never resolves — tests timeout/loading-stuck UI), or a number in milliseconds (passed as a string, e.g. `"2000"`).
 
 ## The one rule for scenario descriptions
 

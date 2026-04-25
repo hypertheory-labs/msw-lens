@@ -13,8 +13,9 @@ Every time you start a new AI conversation about your app, it begins cold. No me
 
 msw-lens produces **committed artifacts** that any AI instance can read and reason about immediately:
 
-- `src/mocks/active-scenarios.ts` — what conditions your app is running under right now
-- `.msw-lens/context.md` — a snapshot of every mocked endpoint and active scenario
+- `src/mocks/active-scenarios.ts` — which scenario is active per endpoint
+- `src/mocks/bypassed-endpoints.ts` — endpoints currently bypassing MSW (real-network passthrough)
+- `.msw-lens/context.md` — a snapshot of every mocked endpoint, active scenario, and bypass status
 - `.msw-lens/prompts/<component>.md` — a ready-to-paste prompt with the real source inlined
 
 Drop `context.md` into any conversation. That instance knows what's mocked, what's active, and where the source lives. No narration required.
@@ -30,6 +31,7 @@ npm install --save-dev @hypertheory-labs/msw-lens
 ```json
 {
   "scripts": {
+    "lens:init": "msw-lens --init",
     "lens": "msw-lens",
     "lens:watch": "msw-lens --watch",
     "lens:context": "msw-lens --context"
@@ -39,13 +41,28 @@ npm install --save-dev @hypertheory-labs/msw-lens
 
 Zero-config if your MSW handlers live in `src/mocks/` (MSW's default). Otherwise add a `msw-lens` block pointing at your mocks directory — see [Configuration](https://github.com/hypertheory-labs/msw-lens/blob/main/docs/manifest-format.md).
 
+Run `npm run lens:init` once after install to bootstrap the tool-owned files.
+
+### MSW prerequisite for bypass
+
+For the bypass option to pass through to real APIs, start MSW with `onUnhandledRequest: 'bypass'`:
+
+```typescript
+worker.start({ onUnhandledRequest: 'bypass' });
+```
+
+This is conventional MSW dev configuration — mock what you intend to mock, real-network everything else.
+
 ## Commands
 
 ```bash
+npm run lens:init                                     # bootstrap tool-owned files (run once)
 npm run lens                                          # interactive scenario switcher
 npm run lens:watch                                    # stay in switcher, Ctrl+C to exit
 npm run lens:context -- <path/to/component.ts>        # generate an LLM prompt
 ```
+
+The switcher's scenario picker offers `bypass — pass through to real API` per endpoint. Picking it filters the handler out of MSW registration so requests reach the real network. Pick any other scenario to restore mocking.
 
 ## Minimum viable manifest
 
@@ -90,7 +107,7 @@ This repo contains demo apps showing msw-lens working across frameworks — same
 |-----|-----------|--------|
 | `apps/angular-demo/` | Angular 21 + Tailwind + DaisyUI | working |
 | `apps/react-demo/` | Vite + React 19 + Tailwind + DaisyUI | working |
-| `apps/vue-demo/` | Vue 3 + Vite | coming in 0.2.0 |
+| `apps/vue-demo/` | Vue 3 + Vite | planned |
 
 ```bash
 nx serve angular-demo       # dev server
