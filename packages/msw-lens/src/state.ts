@@ -6,6 +6,10 @@ function statePath(config: LensConfig): string {
   return join(config.mocksDir, 'active-scenarios.ts');
 }
 
+function bypassedPath(config: LensConfig): string {
+  return join(config.mocksDir, 'bypassed-endpoints.ts');
+}
+
 export function readActiveScenarios(cwd: string, config: LensConfig): Record<string, string> {
   const fullPath = join(cwd, statePath(config));
   try {
@@ -39,6 +43,46 @@ ${entries}
 };
 
 export default activeScenarios;
+`;
+  writeFileSync(fullPath, content, 'utf8');
+}
+
+export function readBypassed(cwd: string, config: LensConfig): Set<string> {
+  const fullPath = join(cwd, bypassedPath(config));
+  try {
+    const content = readFileSync(fullPath, 'utf8');
+    const match = content.match(/Set<string>\(\[([\s\S]*?)\]\)/);
+    if (!match) return new Set();
+    const entries = new Set<string>();
+    for (const line of match[1].split('\n')) {
+      const m = line.match(/^\s*'([^']+)'\s*,?\s*$/);
+      if (m) entries.add(m[1]);
+    }
+    return entries;
+  } catch {
+    return new Set();
+  }
+}
+
+export function writeBypassed(cwd: string, config: LensConfig, bypassed: Set<string>): void {
+  const fullPath = join(cwd, bypassedPath(config));
+  const sorted = [...bypassed].sort();
+  const arrayBody = sorted.length
+    ? `\n${sorted.map((k) => `  '${k}',`).join('\n')}\n`
+    : '';
+
+  const content = `/**
+ * Bypassed endpoints — written by msw-lens, do not edit manually.
+ *
+ * Endpoints in this set are filtered out of MSW handler registration so
+ * matching requests pass through to the real network. Requires MSW worker
+ * started with \`onUnhandledRequest: 'bypass'\`.
+ *
+ * Keys are "METHOD path" — same format as active-scenarios.ts.
+ */
+const bypassed = new Set<string>([${arrayBody}]);
+
+export default bypassed;
 `;
   writeFileSync(fullPath, content, 'utf8');
 }

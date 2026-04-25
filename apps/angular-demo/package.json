@@ -4,7 +4,8 @@
   "scripts": {
     "lens": "msw-lens",
     "lens:watch": "msw-lens --watch",
-    "lens:context": "msw-lens --context"
+    "lens:context": "msw-lens --context",
+    "lens:init": "msw-lens --init"
   },
   "msw-lens": {
     "templateExtension": ".html"

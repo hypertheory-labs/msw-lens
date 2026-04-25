@@ -36,9 +36,9 @@ scenarios:
 
 Four things are non-negotiable:
 
-1. **\`endpoint\` MUST match the handler's \`ENDPOINT\` constant exactly.** The switcher writes keys to \`active-scenarios.ts\` as \`METHOD endpoint\` (e.g. \`GET /api/cart\`); the handler reads keys in the same format. A mismatch is silent — the handler falls through to its default case forever and the switcher appears to do nothing.
+1. **\`endpoint\` MUST match the handler's \`ENDPOINT\` constant exactly, and both must match what the source actually calls.** If the source uses an absolute URL (e.g. \`fetch('https://api.example.com/posts')\`), use that absolute URL as both \`endpoint\` and \`ENDPOINT\` — MSW intercepts absolute URLs directly. Do not modify the source. The switcher writes keys to \`active-scenarios.ts\` as \`METHOD endpoint\` (e.g. \`GET /api/cart\`); the handler reads keys in the same format. A mismatch is silent — the handler falls through to its default case forever and the switcher appears to do nothing.
 
-2. **\`shape\` is \`document\` or \`collection\` — literal values.** It determines which scenario archetypes apply (single-item vs list).
+2. **\`shape\` is \`document\` or \`collection\` (literal values) for GET endpoints. Omit \`shape\` for mutations** (POST/PUT/PATCH/DELETE) — the method itself drives the archetype vocabulary.
 
 3. **At most one scenario has \`active: true\`** — and you should always specify one. The fallback (first scenario in declaration order) reorders silently when the manifest is edited.
 
