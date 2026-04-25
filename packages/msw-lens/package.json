@@ -1,6 +1,6 @@
 {
   "name": "@hypertheory-labs/msw-lens",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Scenario switcher and context generator for MSW Mock Service Worker",
   "keywords": [
     "msw",
