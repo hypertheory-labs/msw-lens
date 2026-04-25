@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join, relative } from 'path';
 import type { Manifest } from './discover.js';
 import type { LensConfig } from './config.js';
+import { MANIFEST_FORMAT_BODY } from './manifest-format.js';
 
 const LENS_DIR = '.msw-lens';
 
@@ -24,32 +25,7 @@ Manifests live alongside handlers: \`auth/user.yaml\` next to \`auth/user.ts\`.
 `.trim();
 }
 
-const MANIFEST_FORMAT = `
-## Manifest format
-
-\`\`\`yaml
-endpoint: /api/resource/
-method: GET
-shape: document         # document | collection — determines scenario vocabulary
-description: What this endpoint returns
-
-responseType:
-  name: TypeScriptTypeName
-  path: relative/path/to/types.ts
-
-context:
-  sourceHints:          # paths to files that consume this endpoint
-    - path/to/store.ts  # LLM reads these directly — provide pointers, not summaries
-    - path/to/component.ts
-
-scenarios:
-  scenario-name:
-    description: What UI behavior this tests (not just what the data looks like)
-    active: true        # marks the default scenario
-    httpStatus: 401     # optional — omit for 200
-    delay: real    # optional — MSW delay mode
-\`\`\`
-`.trim();
+const MANIFEST_FORMAT = `## Manifest format\n\n${MANIFEST_FORMAT_BODY}`;
 
 function getActive(m: Manifest, activeScenarios: Record<string, string>): string {
   return (

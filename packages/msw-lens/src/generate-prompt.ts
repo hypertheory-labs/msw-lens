@@ -3,6 +3,7 @@ import { basename, join, relative } from 'path';
 import type { Manifest } from './discover.js';
 import type { LensConfig } from './config.js';
 import { discoverRelatedFiles } from './follow-imports.js';
+import { MANIFEST_FORMAT_BODY } from './manifest-format.js';
 
 const LENS_DIR = '.msw-lens';
 const PROMPTS_DIR = join(LENS_DIR, 'prompts');
@@ -100,10 +101,10 @@ export function generatePromptFile(
     'Based on the source files below, please:',
     '',
     '1. Identify the HTTP endpoints this component reaches — through its hooks, stores, services, or direct fetch/http calls',
-    '2. For each endpoint, generate a `.yaml` manifest in msw-lens format',
+    '2. For each endpoint, generate a `.yaml` manifest in msw-lens format (see "Manifest pattern" below)',
     '3. For each endpoint, also generate a handler stub (`.ts`) with a switch statement',
-    '   over the scenario names — match the pattern in the existing handler files',
-    '4. Register the new handler in `handlers.ts` — match the existing import pattern',
+    '   over the scenario names (see "Handler pattern" below)',
+    '4. Register the new handler in `handlers.ts` — match the import pattern shown above',
     '5. For each scenario, cover: happy path, empty/null states, error conditions',
     '   (with appropriate HTTP status codes), slow/timeout, and any edge cases the',
     '   **response type shape** suggests I haven\'t anticipated',
@@ -112,8 +113,8 @@ export function generatePromptFile(
     'looks like. Not: "Returns an empty items array." Instead: "Tests that the empty',
     'cart message appears and the checkout button disables."',
     '',
-    'Use the format and vocabulary from the existing manifests below. If you notice',
-    'anything in the component or its markup that suggests a scenario I should',
+    'Follow the canonical Manifest pattern in the "About msw-lens" section below. If you',
+    'notice anything in the component or its markup that suggests a scenario I should',
     'consider but haven\'t asked about — flag it.',
     '',
     'If the provided files are incomplete — init methods with no visible call site,',
@@ -163,6 +164,10 @@ export function generatePromptFile(
     `\`${config.mocksDir}/active-scenarios.ts\` — Vite HMR picks it up immediately.`,
     '',
     '`active-scenarios.ts` is tool-owned. Do not include instructions to edit it manually.',
+    '',
+    '### Manifest pattern (match this exactly)',
+    '',
+    MANIFEST_FORMAT_BODY,
     '',
     '### Handler pattern (match this exactly)',
     '',
