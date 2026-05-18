@@ -12,8 +12,11 @@ const watch = process.argv.includes('--watch') || process.argv.includes('-w');
 const init = process.argv.includes('--init');
 
 const contextFlagIdx = process.argv.indexOf('--context');
-const contextFile =
-  contextFlagIdx !== -1 ? resolve(cwd, process.argv[contextFlagIdx + 1]) : null;
+const contextArg = contextFlagIdx !== -1 ? process.argv[contextFlagIdx + 1] : null;
+// Normalize backslashes → forward slashes so users can paste Windows-style
+// paths on any platform. path.resolve handles forward slashes on both win32
+// and posix; the reverse is not true.
+const contextFile = contextArg ? resolve(cwd, contextArg.replace(/\\/g, '/')) : null;
 
 if (!existsSync(join(cwd, 'package.json'))) {
   console.error('msw-lens must be run from a project root (package.json not found).');

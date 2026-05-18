@@ -8,7 +8,7 @@ const SOURCE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx'];
 // Files we don't want to pull into LLM context — noise, not signal
 const SKIP_PATTERNS = [
   /\.(spec|test)\.(tsx?|jsx?)$/, // test files — never useful
-  /\/index\.(tsx?|jsx?)$/,        // barrel files — just re-exports, no content
+  /[\\/]index\.(tsx?|jsx?)$/,     // barrel files — just re-exports, no content (accept either separator for Windows)
 ];
 
 function shouldSkip(filePath: string): boolean {

@@ -1,6 +1,7 @@
 import { glob } from 'glob';
 import yaml from 'js-yaml';
 import { readFileSync } from 'fs';
+import { normalize } from 'path';
 import type { LensConfig } from './config.js';
 
 export interface Scenario {
@@ -30,9 +31,12 @@ export async function discoverManifests(cwd: string, config: LensConfig): Promis
 
   const manifests: Manifest[] = [];
   for (const file of files) {
-    const content = readFileSync(file, 'utf8');
+    // glob returns forward-slash paths even on Windows; normalize so downstream
+    // path.relative / path.dirname operations agree with the platform separator.
+    const filePath = normalize(file);
+    const content = readFileSync(filePath, 'utf8');
     const parsed = yaml.load(content) as Manifest;
-    parsed._filePath = file;
+    parsed._filePath = filePath;
     manifests.push(parsed);
   }
   return manifests;
